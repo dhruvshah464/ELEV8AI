@@ -1,7 +1,5 @@
-![Star Badge](https://img.shields.io/static/v1?label=%F0%9F%8C%9F&message=If%20Useful&style=flat&color=BC4E99)
-![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)
-[![View My Profile](https://img.shields.io/badge/View-My_Profile-green?logo=LinkedIn)](https://linkedin.com/in/dhruv-shah-69249b227/)
-[![View My Resume](https://img.shields.io/badge/View-My_Resume-0A66C2?logo=LinkedIn&logoColor=white)](https://linkedin.com/in/dhruv-shah-69249b227/)
+[![View My Profile](https://img.shields.io/badge/View-My_Profile-green?logo=LinkedIn)](https://www.linkedin.com/in/shah-dhruv-/)
+[![View My Resume](https://img.shields.io/badge/View-My_Resume-0A66C2?logo=LinkedIn&logoColor=white)](https://www.linkedin.com/in/shah-dhruv-/)
 
 <h1 align="center">💼 JobGeniusAI – AI Career Coach 🤖</h1>
 
@@ -106,12 +104,8 @@ To learn more about the technologies used in this project:
 
 ## 🤝 Connect with Me
 
-<a href="https://linkedin.com/in/dhruv-shah-69249b227/" target="_blank">
+<a href="https://www.linkedin.com/in/shah-dhruv-/" target="_blank">
   <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
-</a>
-&nbsp;
-<a href="https://x.com/dev_goyal_g" target="_blank">
-  <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" alt="Twitter"/>
 </a>
 
 ---
