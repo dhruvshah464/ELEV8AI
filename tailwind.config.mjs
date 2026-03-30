@@ -61,8 +61,10 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        xl: "1.75rem",
+        "2xl": "2rem",
       },
       keyframes: {
         "accordion-down": {
@@ -109,8 +111,9 @@ export default {
         "float-slow": "float-slow 7s ease-in-out infinite",
       },
       boxShadow: {
-        premium: "0 20px 60px rgba(2, 6, 23, 0.35)",
-        glow: "0 0 0 1px rgba(255,255,255,0.04), 0 20px 80px rgba(34, 211, 238, 0.12)",
+        premium: "0 24px 60px rgba(0, 0, 0, 0.4)",
+        glow: "0 0 0 1px rgba(255,255,255,0.02), 0 20px 80px rgba(255, 255, 255, 0.05)",
+        ambient: "0 0 120px rgba(255, 255, 255, 0.03)",
       },
     },
   },

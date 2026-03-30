@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { logAppError } from "@/lib/error-utils";
 import { createClient } from "@/lib/supabase/client";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -121,158 +121,152 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="glass-panel-strong relative overflow-hidden border-white/10">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.14),transparent_20%)]" />
-        <CardContent className="relative p-6 sm:p-8">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_340px]">
+    <div className="mx-auto max-w-5xl space-y-12 pb-16">
+      {/* Header Section */}
+      <section className="relative pt-6">
+        <div className="pointer-events-none absolute -inset-x-6 top-0 h-[300px] bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.02),transparent_50%)]" />
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">
+            <Sparkles className="h-3.5 w-3.5" />
+            Execution System
+          </div>
+          <h1 className="mt-6 text-4xl font-normal tracking-tight text-white sm:text-5xl">
+            Focus on <span className="font-medium text-gradient-premium">momentum</span>.
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-400">
+            Clear the tasks that move your hiring signal forward, skip low-value work,
+            and keep your mission engine pointed at outcomes instead of busyness.
+          </p>
+
+          <div className="mt-10 flex gap-8">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-cyan-100">
-                <Sparkles className="h-3.5 w-3.5" />
-                Execution queue
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Pending</p>
+              <p className="mt-1 text-2xl font-medium text-white">{pendingTasks.length}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Completed</p>
+              <p className="mt-1 text-2xl font-medium text-emerald-100">{completedTasks.length}</p>
+            </div>
+            <div className="flex-1 max-w-xs ml-auto self-end">
+              <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500 mb-2">
+                <span>Queue completion</span>
+                <span>{completionRate}%</span>
               </div>
-              <h1 className="mt-5 text-4xl font-semibold text-white sm:text-5xl">
-                Operate your
-                <span className="text-gradient-premium"> daily momentum</span>.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                Clear the tasks that move your hiring signal forward, skip low-value work,
-                and keep the mission engine pointed at outcomes instead of busyness.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-              {[
-                { label: "Pending", value: pendingTasks.length, tone: "text-cyan-100" },
-                { label: "Completed", value: completedTasks.length, tone: "text-emerald-100" },
-                { label: "Completion", value: `${completionRate}%`, tone: "text-violet-100" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-[1.35rem] border border-white/10 bg-white/[0.05] p-4"
-                >
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-                    {item.label}
-                  </p>
-                  <p className={`mt-3 text-2xl font-semibold ${item.tone}`}>{item.value}</p>
-                </div>
-              ))}
+              <div className="h-1 w-full bg-white/[0.05] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)] rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${completionRate}%` }}
+                />
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {tasks.length === 0 ? (
-        <Card className="border-dashed border-white/10 bg-white/[0.03]">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[1.35rem] bg-gradient-to-br from-violet-500/20 to-cyan-400/20 text-cyan-100">
-              <CheckSquare className="h-7 w-7" />
+      {/* Task List Section */}
+      <section className="pt-8 border-t border-white/[0.04]">
+        {tasks.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/[0.05] bg-white/[0.01] px-6 py-16 text-center flex flex-col items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <CheckSquare className="h-5 w-5 text-slate-400" />
             </div>
-            <h2 className="mt-6 text-2xl font-semibold text-white">No tasks in the queue</h2>
-            <p className="mt-3 max-w-md text-sm leading-7 text-slate-400">
-              Create a mission first and ELEV8 will generate actionable tasks you can
-              complete, skip, and track from the dashboard.
+            <h2 className="mt-6 text-lg font-medium tracking-tight text-white">Queue is empty</h2>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+              Create a mission first and ELEV8 will generate actionable tasks for you.
             </p>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {tasks.length > 0 ? (
-        <Card className="border-white/10">
-          <CardContent className="p-6">
-            <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.22em] text-slate-500">
-              <span>Queue completion</span>
-              <span>{completionRate}%</span>
-            </div>
-            <Progress value={completionRate} className="h-2" />
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {pendingTasks.length > 0 ? (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-white">
-            <Clock className="h-4 w-4 text-cyan-300" />
-            Today’s priority work
           </div>
+        ) : null}
 
-          {pendingTasks.map((task, index) => (
-            <motion.div
-              key={task.id}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.04 }}
-            >
-              <Card className="border-white/10">
-                <CardContent className="flex flex-wrap items-center gap-4 p-5">
+        {pendingTasks.length > 0 ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-slate-500 mb-6">
+              <Clock className="h-3.5 w-3.5" />
+              Today’s Priorities
+            </div>
+
+            <div className="space-y-1">
+              {pendingTasks.map((task, index) => (
+                <motion.div
+                  key={task.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -1 }}
+                  transition={{ delay: index * 0.03, duration: 0.2 }}
+                  className="group flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl px-4 py-3.5 transition-colors hover:bg-white/[0.02] border border-transparent hover:border-white/[0.02]"
+                >
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 text-slate-400 hover:text-emerald-200"
+                    className="h-8 w-8 shrink-0 text-slate-500 hover:text-white border border-white/10 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.05] rounded-lg transition-all"
                     disabled={updatingId === task.id}
                     onClick={() => updateTask(task.id, "completed")}
                   >
                     {updatingId === task.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
-                      <CheckCircle2 className="h-5 w-5" />
+                      <CheckCircle2 className="h-3.5 w-3.5" />
                     )}
                   </Button>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium text-white">{task.title}</p>
-                      <Badge className={priorityStyles[task.priority]}>{task.priority}</Badge>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="text-sm font-medium text-slate-200">{task.title}</p>
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border",
+                        task.priority === "critical" ? "border-red-400/20 text-red-300 bg-red-400/10" :
+                        task.priority === "high" ? "border-amber-400/20 text-amber-300 bg-amber-400/10" :
+                        "border-white/5 text-slate-400 bg-white/5"
+                      )}>
+                        {task.priority}
+                      </span>
                     </div>
                     {task.description ? (
-                      <p className="mt-2 text-sm leading-7 text-slate-400">{task.description}</p>
+                      <p className="mt-1 text-xs text-slate-500 line-clamp-2 pr-12">{task.description}</p>
                     ) : null}
                   </div>
 
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
+                    className="shrink-0 h-8 text-xs font-medium text-slate-500 hover:text-white opacity-0 sm:opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
                     disabled={updatingId === task.id}
                     onClick={() => updateTask(task.id, "skipped")}
                   >
-                    <SkipForward className="h-4 w-4" />
+                    <SkipForward className="h-3.5 w-3.5 mr-1.5" />
                     Skip
                   </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      ) : null}
-
-      {completedTasks.length > 0 ? (
-        <Card className="border-white/10">
-          <CardContent className="p-6">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
-              <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-              Completed momentum
+                </motion.div>
+              ))}
             </div>
-            <div className="space-y-3">
+          </div>
+        ) : null}
+
+        {completedTasks.length > 0 ? (
+          <div className="mt-16 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-slate-500 mb-6 border-t border-white/[0.04] pt-8">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Completed History
+            </div>
+            <div className="space-y-1 opacity-60 hover:opacity-100 transition-opacity duration-500">
               {completedTasks.slice(0, 10).map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 rounded-[1.15rem] border border-white/10 bg-white/[0.04] px-4 py-3"
+                  className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
                 >
-                  <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-slate-300 line-through">{task.title}</p>
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-500">
+                    <CheckCircle2 className="h-3 w-3" />
                   </div>
-                  <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                    done
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-slate-400 line-through decoration-slate-600">{task.title}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      ) : null}
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }

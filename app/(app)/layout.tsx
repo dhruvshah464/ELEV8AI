@@ -129,26 +129,26 @@ function MobileSidebar({
                       href={item.href}
                       onClick={onClose}
                       className={cn(
-                        "block rounded-[1.25rem] border px-4 py-3 transition",
+                        "group block rounded-2xl px-3 py-2.5 transition-all duration-300 ease-in-out",
                         active
-                          ? "border-cyan-400/25 bg-cyan-400/[0.12] text-white"
-                          : "border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+                          ? "bg-white/[0.04] shadow-sm backdrop-blur-md"
+                          : "bg-transparent hover:bg-white/[0.02]"
                       )}
                     >
                       <div className="flex items-start gap-3">
                         <span
                           className={cn(
-                            "mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border",
+                            "mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl",
                             active
-                              ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-200"
-                              : "border-white/10 bg-white/[0.04] text-slate-400"
+                              ? "bg-white/10 text-white shadow-sm glow"
+                              : "bg-transparent text-slate-500 hover:text-white"
                           )}
                         >
                           <Icon className="h-4 w-4" />
                         </span>
                         <div>
-                          <p className="text-sm font-semibold">{item.label}</p>
-                          <p className="mt-1 text-xs text-slate-400">{item.description}</p>
+                          <p className={cn("text-sm font-medium", active ? "text-white" : "text-slate-400 group-hover:text-slate-200")}>{item.label}</p>
+                          <p className="mt-0.5 text-xs text-slate-500">{item.description}</p>
                         </div>
                       </div>
                     </Link>
@@ -250,22 +250,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
       <div className="mx-auto flex min-h-screen max-w-[1680px]">
         <aside className="glass-panel-strong sticky top-0 hidden h-screen w-[300px] shrink-0 flex-col border-r border-white/10 px-6 py-6 lg:flex">
-          <Link href="/dashboard" className="group">
-            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] px-5 py-5 transition group-hover:border-cyan-400/25 group-hover:bg-white/[0.06]">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 via-blue-500/20 to-cyan-400/20 text-cyan-100 shadow-[0_12px_40px_rgba(34,211,238,0.18)]">
-                  <Sparkles className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.32em] text-cyan-200/70">
-                    ELEV8.AI
-                  </p>
-                  <h1 className="mt-1 text-xl font-semibold text-white">Career OS</h1>
-                </div>
+          <Link href="/dashboard" className="group block mb-2 px-1">
+            <div className="flex items-center gap-3 transition-transform group-hover:scale-[0.98]">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 backdrop-blur-md text-white shadow-ambient">
+                <Sparkles className="h-4 w-4" />
+              </span>
+              <div>
+                <h1 className="text-lg font-semibold tracking-tight text-white">ELEV8.AI</h1>
+                <p className="text-xs font-medium text-slate-500">Career OS</p>
               </div>
-              <p className="mt-4 text-sm leading-6 text-slate-400">
-                A futuristic execution layer for landing your next role with AI.
-              </p>
             </div>
           </Link>
 
@@ -279,26 +272,26 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <Link
                     href={item.href}
                     className={cn(
-                      "block rounded-[1.25rem] border px-4 py-3 transition",
+                      "group block rounded-xl px-3 py-2.5 transition-all duration-300 ease-in-out",
                       active
-                        ? "border-cyan-400/20 bg-cyan-400/[0.1] text-white shadow-[0_18px_40px_rgba(34,211,238,0.08)]"
-                        : "border-white/5 bg-white/[0.03] text-slate-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+                        ? "bg-white/[0.06] shadow-sm backdrop-blur-md"
+                        : "bg-transparent hover:bg-white/[0.02]"
                     )}
                   >
                     <div className="flex items-start gap-3">
                       <span
                         className={cn(
-                          "mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border",
+                          "mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-lg transition-transform group-hover:scale-105 group-active:scale-95",
                           active
-                            ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-100"
-                            : "border-white/10 bg-white/[0.04] text-slate-400"
+                            ? "bg-white/10 text-white shadow-ambient"
+                            : "bg-transparent text-slate-500"
                         )}
                       >
                         <Icon className="h-4 w-4" />
                       </span>
                       <div>
-                        <p className="text-sm font-semibold">{item.label}</p>
-                        <p className="mt-1 text-xs text-slate-400">{item.description}</p>
+                        <p className={cn("text-sm font-medium", active ? "text-white" : "text-slate-400 group-hover:text-slate-200")}>{item.label}</p>
+                        <p className={cn("text-xs transition-opacity", active ? "text-slate-400 opacity-100 mt-0.5" : "text-slate-500 opacity-0 h-0 overflow-hidden group-hover:opacity-100 group-hover:h-auto group-hover:mt-0.5")}>{item.description}</p>
                       </div>
                     </div>
                   </Link>
@@ -307,56 +300,36 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="mt-8 rounded-[1.4rem] border border-white/10 bg-gradient-to-br from-violet-500/[0.1] via-transparent to-cyan-400/[0.08] p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-cyan-100">
-                <Command className="h-4 w-4" />
+          {/* Minimal divider instead of full box for search */}
+          <div className="mt-8 px-2 py-4 border-t border-white/[0.04]">
+            <div className="flex items-center justify-between text-xs text-slate-500 group cursor-pointer hover:text-slate-300 transition-colors">
+              <div className="flex items-center gap-2">
+                <Command className="h-3.5 w-3.5" />
+                <span className="font-medium">Command</span>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Command Palette</p>
-                <p className="text-xs text-slate-400">Search any workspace instantly.</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-xs text-slate-300">
-              <span>Launch palette</span>
-              <span className="rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-400">
-                ⌘K / Ctrl K
-              </span>
+              <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px]">⌘K</span>
             </div>
           </div>
 
-          <div className="mt-auto rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 via-blue-500/20 to-cyan-400/20 text-sm font-semibold text-white">
+          <div className="mt-auto px-1">
+            <div className="group flex items-center gap-3 rounded-xl p-2 hover:bg-white/[0.03] transition-colors cursor-pointer" onClick={handleSignOut}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white shadow-ambient">
                 {userName.slice(0, 1).toUpperCase()}
               </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white">{userName}</p>
-                <p className="truncate text-xs text-slate-400">{user.email}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white">{userName}</p>
+                <p className="truncate text-xs text-slate-500">Sign out</p>
+              </div>
+              <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 text-slate-400">
+                <LogOut className="h-4 w-4" />
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2">
-              <div className="flex items-center gap-2 text-xs text-slate-300">
-                <Trophy className="h-3.5 w-3.5 text-cyan-300" />
-                {profile?.onboarded ? "Mission-ready" : "Needs onboarding"}
-              </div>
-              <Rocket className="h-3.5 w-3.5 text-violet-300" />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-4 w-full justify-center"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-4 w-4" />
-              Sign out
-            </Button>
           </div>
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0b1220]/72 backdrop-blur-xl">
-            <div className="flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <header className="sticky top-0 z-30 bg-transparent py-4 backdrop-blur-sm mask-gradient-top">
+            <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
               <div className="flex items-center gap-3">
                 <Button
                   type="button"
@@ -365,27 +338,21 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   className="lg:hidden"
                   onClick={() => setMobileMenuOpen(true)}
                 >
-                  <Menu className="h-4 w-4" />
+                  <Menu className="h-5 w-5" />
                 </Button>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.28em] text-cyan-200/70">
-                    Career Operating System
-                  </p>
-                  <h2 className="mt-1 text-lg font-semibold text-white">
+                  <h2 className="text-lg font-medium text-white tracking-tight">
                     {currentSection.label}
                   </h2>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="hidden items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 md:flex">
-                  <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(34,211,238,0.9)]" />
-                  <span className="text-xs text-slate-300">
-                    AI services online
+                <div className="hidden items-center gap-2 rounded-full bg-white/[0.03] border border-white/[0.03] px-3 py-1.5 md:flex shadow-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/40 shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
+                  <span className="text-xs font-medium text-slate-400">
+                    Neural Engine
                   </span>
-                </div>
-                <div className="hidden rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-slate-400 sm:block">
-                  {currentSection.description}
                 </div>
               </div>
             </div>

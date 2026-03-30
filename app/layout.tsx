@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AppBackground } from "@/components/core/app-background";
 import { PageTransition } from "@/components/core/page-transition";
 import { CommandPalette } from "@/components/core/command-palette";
+import { SmoothScroller } from "@/components/core/smooth-scroller";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,12 +37,14 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
-            <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-              <AppBackground />
-              <PageTransition>{children}</PageTransition>
-              <CommandPalette />
-              <Toaster richColors position="top-right" />
-            </div>
+            <SmoothScroller>
+              <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+                <AppBackground />
+                <PageTransition>{children}</PageTransition>
+                <CommandPalette />
+                <Toaster richColors position="top-right" />
+              </div>
+            </SmoothScroller>
           </AuthProvider>
         </ThemeProvider>
       </body>

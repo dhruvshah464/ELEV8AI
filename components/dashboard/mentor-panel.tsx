@@ -253,59 +253,61 @@ export function MentorPanel({
   };
 
   return (
-    <Card className="h-full overflow-hidden">
-      <CardHeader className="border-b border-white/10 pb-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base text-white">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-cyan-400/20 text-cyan-200">
-                <Bot className="h-4 w-4" />
-              </span>
-              AI Mentor Panel
-            </CardTitle>
-            <CardDescription>
-              Streaming strategy and accountability tuned to your mission.
-            </CardDescription>
+    <div className="flex h-full flex-col rounded-2xl border border-white/[0.04] bg-white/[0.01] backdrop-blur-sm relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+      
+      <div className="border-b border-white/[0.04] px-5 py-4 relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.04] border border-white/5 text-slate-300 shadow-ambient">
+            <Bot className="h-4 w-4" />
           </div>
-          <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200">
-            Live
+          <div>
+            <h2 className="text-sm font-medium text-white tracking-tight">AI Mentor</h2>
+            <p className="text-xs text-slate-500">Live Strategy</p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="flex h-[34rem] flex-col gap-4 p-0">
-        <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-5">
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((suggestion) => (
-              <button
-                key={suggestion}
-                type="button"
-                onClick={() => sendMessage(suggestion)}
-                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-slate-300 transition hover:-translate-y-0.5 hover:border-cyan-300/30 hover:text-white"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+          <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">Online</span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col overflow-hidden relative z-10">
+        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-6 scrollbar-none">
+          {messages.length === 1 && (
+            <div className="mb-6 flex flex-wrap gap-2">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => sendMessage(suggestion)}
+                  className="rounded-full border border-white/[0.05] bg-white/[0.02] px-3.5 py-1.5 text-xs text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          )}
 
           <AnimatePresence initial={false}>
             {messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.24 }}
+                initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                 className={cn(
-                  "max-w-[92%] whitespace-pre-wrap rounded-[1.25rem] border px-4 py-3 text-sm leading-6 shadow-[0_10px_30px_rgba(2,6,23,0.25)]",
+                  "max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   message.role === "assistant"
-                    ? "border-cyan-400/20 bg-cyan-400/[0.08] text-slate-100"
-                    : "ml-auto border-violet-400/20 bg-violet-500/[0.14] text-white"
+                    ? "border border-white/[0.04] bg-white/[0.03] text-slate-300 shadow-sm"
+                    : "ml-auto bg-white/10 text-white shadow-sm"
                 )}
               >
                 {message.content || (
-                  <span className="inline-flex items-center gap-2 text-cyan-100/80">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Thinking...
+                  <span className="flex items-center gap-2 text-slate-400 opacity-80 animate-pulse">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Synthesizing...
                   </span>
                 )}
               </motion.div>
@@ -313,26 +315,26 @@ export function MentorPanel({
           </AnimatePresence>
         </div>
 
-        <div className="border-t border-white/10 px-5 py-4">
+        <div className="border-t border-white/[0.04] p-4 bg-white/[0.01]">
           {error && (
-            <div className="mb-3 flex items-center justify-between rounded-[1rem] border border-rose-400/20 bg-rose-400/[0.08] px-3 py-2 text-xs text-rose-100">
-              <span>{error}</span>
+            <div className="mb-3 flex items-center justify-between rounded-xl border border-rose-500/10 bg-rose-500/5 px-3 py-2 text-xs text-rose-200/80">
+              <span className="truncate pr-4">{error}</span>
               {lastPrompt && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => sendMessage(lastPrompt)}
-                  className="h-7 rounded-full px-3 text-rose-100 hover:bg-rose-400/10"
+                  className="h-6 gap-1 rounded-md px-2 text-rose-200/80 hover:bg-rose-500/10 hover:text-rose-100"
                 >
-                  <RefreshCw className="mr-1 h-3.5 w-3.5" />
+                  <RefreshCw className="h-3 w-3" />
                   Retry
                 </Button>
               )}
             </div>
           )}
 
-          <div className="relative">
+          <div className="relative flex items-end gap-2">
             <Textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
@@ -342,30 +344,26 @@ export function MentorPanel({
                   void sendMessage();
                 }
               }}
-              placeholder="Ask your mentor for a sharper next move..."
-              rows={3}
-              className="min-h-[92px] rounded-[1.2rem] border-white/10 bg-white/[0.04] pr-14 pt-4 text-white placeholder:text-slate-500"
+              placeholder="Ask for a sharper next move..."
+              rows={1}
+              className="max-h-[120px] min-h-[44px] w-full resize-none rounded-xl border-white/[0.08] bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-white/20"
             />
             <Button
               type="button"
+              size="icon"
               onClick={() => void sendMessage()}
               disabled={loading || !input.trim()}
-              className="absolute right-2 top-1/2 h-10 w-10 -translate-y-1/2 rounded-[0.95rem] p-0"
+              className="h-11 w-11 shrink-0 rounded-xl bg-white text-slate-900 hover:bg-slate-200 shadow-ambient disabled:opacity-30 disabled:hover:bg-white transition-all"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4 translate-x-[-1px] translate-y-[1px]" />
               )}
             </Button>
           </div>
-
-          <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-slate-500">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
-            Streaming mentor mode
-          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

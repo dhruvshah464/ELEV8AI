@@ -21,27 +21,22 @@ export function MetricCard({
   accentClassName,
 }: MetricCardProps) {
   return (
-    <motion.div whileHover={{ y: -6, rotateX: 3 }} transition={{ duration: 0.2 }}>
-      <Card className="overflow-hidden">
-        <CardContent className="relative p-5">
-          <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-slate-400">{title}</p>
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">{value}</p>
-              <p className="mt-2 text-sm text-slate-400">{detail}</p>
-            </div>
-            <div
-              className={cn(
-                "rounded-2xl border border-white/10 p-3 shadow-[0_12px_30px_rgba(4,8,20,0.28)]",
-                accentClassName
-              )}
-            >
-              <Icon className="h-5 w-5" />
-            </div>
+    <motion.div 
+      whileHover={{ y: -2 }} 
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="group relative"
+    >
+      <div className="flex flex-col gap-2 rounded-2xl p-5 border border-white/[0.03] bg-white/[0.01] hover:bg-white/[0.03] transition-colors relative overflow-hidden backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="flex items-center gap-3">
+          <div className={cn("inline-flex items-center justify-center p-2 rounded-xl border border-white/5", accentClassName)}>
+            <Icon className="h-4 w-4" />
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">{title}</p>
+        </div>
+        <p className="mt-2 text-3xl font-medium tracking-tight text-white">{value}</p>
+        <p className="text-sm text-slate-500">{detail}</p>
+      </div>
     </motion.div>
   );
 }

@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "@/components/dashboard/metric-card";
@@ -598,108 +599,100 @@ export default function DashboardPage() {
     .join(" | ");
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <Card className="glass-panel-strong relative overflow-hidden border-white/10">
+    <div className="mx-auto max-w-7xl space-y-12">
+      {/* Welcome Section - Flattened & Minimalist */}
+      <section className="relative pt-6 pb-8">
+        <div className="pointer-events-none absolute -inset-x-6 top-0 h-[400px] bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.03),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(255,255,255,0.02),transparent_40%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.14),transparent_20%)]" />
-        <CardContent className="relative p-6 sm:p-8">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.2fr)_320px]">
+        <div className="relative">
+          <div className="grid gap-10 xl:grid-cols-[minmax(0,1.2fr)_320px]">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-cyan-100">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">
                 <Sparkles className="h-3.5 w-3.5" />
                 AI Career Execution Platform
               </div>
-              <h1 className="mt-5 text-4xl font-semibold leading-tight text-white sm:text-5xl">
-                Welcome back, <span className="text-gradient-premium">{firstName}</span>
+              <h1 className="mt-6 text-4xl font-normal tracking-tight text-white sm:text-5xl">
+                Welcome back, <span className="font-medium text-gradient-premium">{firstName}</span>
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-400">
                 Your command center is live. Track progress, clear today’s execution queue,
                 and use the AI mentor to turn momentum into interviews.
               </p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <Badge className="border-violet-400/20 bg-violet-400/10 text-violet-100">
+                <Badge variant="outline" className={cn("bg-transparent", mission ? "border-green-400/20 text-green-300" : "border-amber-400/20 text-amber-300")}>
                   {mission ? "Mission active" : "Mission needed"}
                 </Badge>
-                <Badge variant="outline" className="text-slate-300">
+                <span className="text-sm font-medium text-slate-300">
                   Hireability {metrics.totalScore}/100
-                </Badge>
-                <Badge variant="outline" className="text-slate-300">
+                </span>
+                <span className="text-sm font-medium text-slate-300">
                   {pendingTasks.length} live tasks
-                </Badge>
+                </span>
               </div>
 
-              <div className="mt-8 space-y-4">
-                <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>{missionTitle}</span>
-                  <span>{metrics.missionProgress}% complete</span>
+              <div className="mt-10 space-y-4 max-w-xl">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-300 font-medium">{missionTitle}</span>
+                  <span className="text-slate-500">{metrics.missionProgress}% complete</span>
                 </div>
-                <Progress value={metrics.missionProgress} />
+                {/* Custom minimalist progress bar */}
+                <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${metrics.missionProgress}%` }}
+                  />
+                </div>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild size="lg">
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Button asChild size="lg" className="rounded-xl shadow-ambient">
                   <Link href={mission ? "/tasks" : "/mission"}>
                     {mission ? "Open execution queue" : "Create your first mission"}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
+                <Button asChild size="lg" variant="ghost" className="rounded-xl hover:bg-white/[0.03]">
                   <Link href="/resume">
                     Optimize resume
-                    <TrendingUp className="h-4 w-4" />
+                    <TrendingUp className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
-              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.05] p-5">
+            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.03]">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-500/15 text-violet-100">
-                    <Target className="h-5 w-5" />
-                  </span>
+                  <Target className="h-4 w-4 text-slate-400" />
                   <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
-                      Active mission
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-white">
-                      {mission ? "Locked in" : "Needs launch"}
-                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500">Active mission</p>
+                    <p className="mt-0.5 text-sm font-medium text-white">{mission ? "Locked in" : "Needs launch"}</p>
                   </div>
                 </div>
               </div>
-              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.05] p-5">
+              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.03]">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-400/15 text-cyan-100">
-                    <Flame className="h-5 w-5" />
-                  </span>
+                  <Flame className="h-4 w-4 text-amber-200" />
                   <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
-                      Streak
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-white">
-                      {metrics.streak > 0 ? `${metrics.streak} day run` : "Start today"}
-                    </p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500">Streak</p>
+                    <p className="mt-0.5 text-sm font-medium text-white">{metrics.streak > 0 ? `${metrics.streak} day run` : "Start today"}</p>
                   </div>
                 </div>
               </div>
-              <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.05] p-5">
+              <div className="rounded-2xl border border-white/[0.04] bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.03]">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-100">
-                    <Brain className="h-5 w-5" />
-                  </span>
+                  <Brain className="h-4 w-4 text-cyan-200" />
                   <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-slate-500">
-                      AI mentor
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-white">Streaming live</p>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500">AI mentor</p>
+                    <p className="mt-0.5 text-sm font-medium text-white">Streaming live</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {error && (
         <div className="rounded-[1.3rem] border border-rose-400/20 bg-rose-400/[0.08] px-4 py-3 text-sm text-rose-100">
@@ -738,112 +731,109 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_420px]">
-        <div className="space-y-6">
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-white/10 pb-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-white">Today&apos;s execution queue</CardTitle>
-                  <CardDescription>
-                    Clear the highest-leverage actions first. Every completion lifts your mission.
-                  </CardDescription>
-                </div>
-                <Badge variant="outline" className="text-slate-300">
-                  {pendingTasks.length} pending
-                </Badge>
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_420px]">
+        <div className="space-y-8">
+          <section>
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.04] pb-4">
+              <div>
+                <h2 className="text-xl font-medium tracking-tight text-white">Execution Queue</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Clear the highest-leverage actions first.
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-5">
+              <Badge variant="outline" className="bg-white/[0.02] border-white/[0.05] text-slate-400 font-normal">
+                {pendingTasks.length} pending
+              </Badge>
+            </div>
+            
+            <div className="space-y-1">
               {pendingTasks.length === 0 ? (
-                <div className="rounded-[1.3rem] border border-dashed border-white/10 bg-white/[0.03] px-6 py-12 text-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/15 to-cyan-400/15">
-                    <CheckCircle2 className="h-6 w-6 text-cyan-100" />
+                <div className="rounded-2xl border border-dashed border-white/[0.05] bg-white/[0.01] px-6 py-12 text-center flex flex-col items-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                    <CheckCircle2 className="h-5 w-5 text-slate-400" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-white">
-                    Your queue is clear
-                  </h3>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Launch a mission or generate more tasks to keep momentum high.
+                  <h3 className="mt-4 text-sm font-medium text-white">Queue cleared</h3>
+                  <p className="mt-1 text-xs text-slate-500 max-w-sm">
+                    No pending actions. Generate more tasks to maintain momentum.
                   </p>
-                  <Button asChild className="mt-6">
+                  <Button asChild variant="outline" className="mt-6 bg-transparent border-white/[0.05] hover:bg-white/[0.02] text-white">
                     <Link href={mission ? "/mission" : "/mission"}>
-                      Create next move
-                      <ArrowRight className="h-4 w-4" />
+                      Plan next move
                     </Link>
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-1">
                   <AnimatePresence initial={false}>
                     {pendingTasks.slice(0, 5).map((task) => (
                       <motion.div
                         key={task.id}
                         layout
-                        initial={{ opacity: 0, y: 18 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -12, scale: 0.98 }}
-                        transition={{ duration: 0.22 }}
-                        className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] p-4 shadow-[0_10px_28px_rgba(2,6,23,0.18)]"
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        whileHover={{ y: -1 }}
+                        transition={{ duration: 0.2 }}
+                        className="group flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.02] border border-transparent hover:border-white/[0.02]"
                       >
-                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-                          <div className="flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge
-                                variant="outline"
-                                className={priorityStyles[task.priority] ?? priorityStyles.low}
-                              >
-                                {task.priority}
-                              </Badge>
-                              {task.status === "in_progress" && (
-                                <Badge className="border-violet-400/20 bg-violet-400/10 text-violet-100">
-                                  in progress
-                                </Badge>
-                              )}
-                            </div>
-                            <h3 className="mt-3 text-base font-semibold text-white">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-sm font-medium text-slate-200 truncate">
                               {task.title}
                             </h3>
-                            {task.description && (
-                              <p className="mt-1 text-sm leading-6 text-slate-400">
-                                {task.description}
-                              </p>
-                            )}
+                            <div className="flex shrink-0 items-center gap-2">
+                              {task.status === "in_progress" && (
+                                <span className="inline-flex items-center rounded-full bg-blue-400/10 px-2 py-0.5 text-[10px] font-medium text-blue-300">
+                                  In progress
+                                </span>
+                              )}
+                              <span className={cn(
+                                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border",
+                                task.priority === "critical" ? "border-red-400/20 text-red-300 bg-red-400/10" :
+                                task.priority === "high" ? "border-amber-400/20 text-amber-300 bg-amber-400/10" :
+                                "border-white/5 text-slate-400 bg-white/5"
+                              )}>
+                                {task.priority}
+                              </span>
+                            </div>
                           </div>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            className="shrink-0"
-                            disabled={actionTaskId === task.id}
-                            onClick={() => void completeTask(task.id)}
-                          >
-                            {actionTaskId === task.id ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Updating
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="h-4 w-4" />
-                                Mark complete
-                              </>
-                            )}
-                          </Button>
+                          {task.description && (
+                            <p className="mt-1 text-xs text-slate-500 line-clamp-1">
+                              {task.description}
+                            </p>
+                          )}
                         </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0 h-8 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 opacity-0 sm:opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+                          disabled={actionTaskId === task.id}
+                          onClick={() => void completeTask(task.id)}
+                        >
+                          {actionTaskId === task.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                          ) : (
+                            <CheckCircle2 className="h-3 w-3 mr-1.5" />
+                          )}
+                          Done
+                        </Button>
                       </motion.div>
                     ))}
                   </AnimatePresence>
 
-                  <Button asChild variant="outline" className="w-full justify-center">
-                    <Link href="/tasks">
-                      Open full task board
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="pt-4 mt-2 border-t border-white/[0.03]">
+                    <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-white hover:bg-white/[0.02]">
+                      <Link href="/tasks">
+                        View all tasks
+                        <ArrowRight className="h-3 w-3 ml-1.5" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <SkillGraph data={metrics.signalGraph} />
