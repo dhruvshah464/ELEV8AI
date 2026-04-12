@@ -1,18 +1,20 @@
+@import "./kriya-tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 226 39% 7%; /* #0B0F19 */
+    --background: 226 39% 7%;
     --foreground: 210 40% 98%;
-    --card: 226 39% 8%; /* Slightly lighter than background, but very subtle */
+    --card: 226 39% 8%;
     --card-foreground: 210 40% 98%;
     --popover: 226 39% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%; /* White primary for minimal look */
+    --primary: 210 40% 98%;
     --primary-foreground: 226 39% 7%;
-    --secondary: 226 24% 12%; /* Very faint secondary */
+    --secondary: 226 24% 12%;
     --secondary-foreground: 210 40% 98%;
     --muted: 226 24% 12%;
     --muted-foreground: 215 20% 65%;
@@ -20,7 +22,7 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 226 20% 16%; /* Extremely light borders */
+    --border: 226 20% 16%;
     --input: 226 20% 16%;
     --ring: 210 40% 98%;
     --chart-1: 258 100% 70%;
@@ -28,14 +30,13 @@
     --chart-3: 188 95% 43%;
     --chart-4: 35 92% 61%;
     --chart-5: 160 84% 39%;
-    --radius: 1.5rem; /* Larger border-radius for Apple-like rounded feel */
+    --radius: 1.5rem;
   }
 }
 
 @layer base {
   html {
     color-scheme: dark;
-    /* Removed scroll-behavior: smooth as Lenis will take over */
   }
 
   * {
@@ -44,30 +45,25 @@
 
   body {
     @apply bg-background text-foreground;
-    /* Apple-like ambient, extremely subtle gradient */
     background-image:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.02), transparent 40%),
-      radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.01), transparent 30%);
-    background-color: #0b0f19;
+      radial-gradient(circle at top, var(--kriya-gradient-start), transparent 40%),
+      radial-gradient(circle at bottom left, var(--kriya-gradient-ambient), transparent 30%);
+    background-color: hsl(var(--kriya-surface));
     min-height: 100vh;
     font-family: var(--font-sans), sans-serif;
-    letter-spacing: -0.012em; /* Optimized Inter tracking for Apple feel */
+    letter-spacing: -0.012em;
+    transition: background-color var(--kriya-duration-normal) var(--kriya-ease);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display), var(--font-sans), sans-serif;
-    letter-spacing: -0.025em; /* Tighter layout for headings */
-    font-weight: 500; /* Softer heading weight for elegance */
+    letter-spacing: -0.025em;
+    font-weight: 500;
   }
 
   ::selection {
-    background: rgba(122, 92, 255, 0.34);
-    color: #f8fafc;
+    background: hsl(var(--kriya-primary) / 0.30);
+    color: hsl(var(--kriya-text-primary));
   }
 
   ::-webkit-scrollbar {
@@ -76,16 +72,22 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
+    background: var(--kriya-scrollbar-track);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.55), rgba(34, 211, 238, 0.45));
+    background: linear-gradient(
+      180deg,
+      var(--kriya-scrollbar-thumb-start),
+      var(--kriya-scrollbar-thumb-end)
+    );
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 }
+
+/* ─── KRIYA Utilities ───────────────────────────────────────────── */
 
 @layer utilities {
   .bg-grid-premium {
@@ -111,7 +113,12 @@
   }
 
   .text-gradient-premium {
-    background-image: linear-gradient(120deg, #f8fafc 0%, #a78bfa 34%, #60a5fa 70%, #67e8f9 100%);
+    background-image: linear-gradient(
+      120deg,
+      hsl(var(--kriya-text-primary)) 0%,
+      hsl(var(--kriya-primary)) 40%,
+      hsl(var(--kriya-accent)) 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -119,41 +126,72 @@
 
   .shadow-premium {
     box-shadow:
-      0 16px 50px rgba(59, 130, 246, 0.12),
+      0 16px 50px hsl(var(--kriya-primary) / 0.12),
       0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .shadow-ambient {
+    box-shadow: 0 0 120px rgba(255, 255, 255, 0.03);
+  }
+
+  /* KRIYA Section System — standardized page section spacing */
+  .kriya-section {
+    @apply relative;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .kriya-section + .kriya-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  /* KRIYA Divider — thin gold accent line */
+  .kriya-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--kriya-primary) / 0.2) 30%,
+      hsl(var(--kriya-primary) / 0.2) 70%,
+      transparent 100%
+    );
+  }
+
+  /* KRIYA Typography helpers */
+  .kriya-serif {
+    font-family: var(--font-serif), Georgia, serif;
+  }
+
+  .kriya-label {
+    @apply text-[10px] uppercase tracking-[0.2em] text-slate-500 font-medium;
+  }
+
+  .kriya-headline {
+    font-family: var(--font-serif), Georgia, serif;
+    @apply text-3xl font-light tracking-tight text-white sm:text-4xl;
+    letter-spacing: -0.02em;
+  }
+
+  .kriya-subtext {
+    @apply text-sm leading-relaxed text-slate-400;
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
+/* ─── Keyframe Animations ───────────────────────────────────────── */
 
-  100% {
-    background-position: -200% 0;
-  }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 @keyframes borderPulse {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
 }
 
 @keyframes floatSlow {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  50% {
-    transform: translate3d(0, -10px, 0);
-  }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
 }
 
 .animate-shimmer {
@@ -165,4 +203,103 @@
   );
   background-size: 220% 100%;
   animation: shimmer 1.8s linear infinite;
+}
+
+/* ─── Shiva Keyframes — Destruction & Transformation ────────────── */
+
+@keyframes shiva-dissolve {
+  0% { opacity: 1; filter: blur(0px); transform: scale(1); }
+  100% { opacity: 0; filter: blur(8px); transform: scale(0.96); }
+}
+
+@keyframes shiva-build {
+  0% { opacity: 0; filter: blur(8px); transform: translateY(16px); }
+  100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+}
+
+@keyframes shiva-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* ─── KRIYA Background System (CSS-only, no JS re-renders) ──────── */
+
+@keyframes kriya-orb-1 {
+  0%, 100% { opacity: 0.3; transform: scale(1) translate3d(0, 0, 0); }
+  50% { opacity: 0.5; transform: scale(1.06) translate3d(0, 0, 0); }
+}
+
+@keyframes kriya-orb-2 {
+  0%, 100% { opacity: 0.2; transform: scale(1.04) translate3d(0, 0, 0); }
+  50% { opacity: 0.35; transform: scale(0.96) translate3d(0, 0, 0); }
+}
+
+@keyframes kriya-particle-float {
+  0%, 100% { opacity: 0.1; transform: translateY(0) translate3d(0, 0, 0); }
+  50% { opacity: 0.5; transform: translateY(-14px) translate3d(0, 0, 0); }
+}
+
+@keyframes kriya-glyph-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.kriya-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  will-change: transform, opacity;
+}
+
+.kriya-orb--primary {
+  top: -8rem;
+  left: 33%;
+  width: 26rem;
+  height: 26rem;
+  background: radial-gradient(circle, hsl(var(--kriya-primary) / 0.22), transparent 60%);
+  animation: kriya-orb-1 16s ease-in-out infinite;
+}
+
+.kriya-orb--accent {
+  bottom: -10rem;
+  right: -6rem;
+  width: 28rem;
+  height: 28rem;
+  background: radial-gradient(circle, hsl(var(--kriya-accent) / 0.14), transparent 60%);
+  animation: kriya-orb-2 20s ease-in-out infinite;
+}
+
+.kriya-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: hsl(var(--kriya-primary));
+  box-shadow: 0 0 16px hsl(var(--kriya-primary) / 0.4);
+  will-change: transform, opacity;
+  animation: kriya-particle-float var(--duration, 18s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.kriya-pointer-follower {
+  position: absolute;
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
+  filter: blur(32px);
+  will-change: transform;
+  transition: none;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* Reduced motion: disable all ambient animations */
+@media (prefers-reduced-motion: reduce) {
+  .kriya-orb,
+  .kriya-particle,
+  .kriya-pointer-follower {
+    animation: none !important;
+    display: none;
+  }
 }

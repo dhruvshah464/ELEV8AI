@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircle2,
@@ -15,26 +15,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { logAppError } from "@/lib/error-utils";
 import { createClient } from "@/lib/supabase/client";
 import { optimizeResumeRequest } from "@/lib/ai/client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { shivaBuild, vishnuContainer, vishnuItem } from "@/lib/motion";
 import type { Resume } from "@/types";
-
-function ResumeSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-[220px] rounded-[1.75rem]" />
-      <Skeleton className="h-[420px] rounded-[1.5rem]" />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Skeleton className="h-[260px] rounded-[1.5rem]" />
-        <Skeleton className="h-[260px] rounded-[1.5rem]" />
-      </div>
-    </div>
-  );
-}
 
 export default function ResumePage() {
   const { user, profile } = useAuth();
@@ -46,342 +31,218 @@ export default function ResumePage() {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
+    if (!user) { setLoading(false); return; }
     let cancelled = false;
-
-    supabase
-      .from("resumes")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle()
+    supabase.from("resumes").select("*").eq("user_id", user.id).maybeSingle()
       .then(({ data, error }: { data: Resume | null; error: any }) => {
         if (cancelled) return;
-
-        if (error) {
-          logAppError("[RESUME] Failed to load resume:", error);
-          toast.error("We could not load your resume lab.");
-          setLoading(false);
-          return;
-        }
-
-        if (data) {
-          setResume(data);
-          setContent(data.content);
-        }
-
+        if (error) { logAppError("[RESUME] Failed to load resume:", error); toast.error("Could not load your resume."); }
+        if (data) { setResume(data); setContent(data.content); }
         setLoading(false);
       });
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [supabase, user]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!user) return;
-
     setSaving(true);
-
-    const { data, error } = await supabase
-      .from("resumes")
-      .upsert(
-        {
-          user_id: user.id,
-          content,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select()
-      .single();
-
+    const { data, error } = await supabase.from("resumes").upsert(
+      { user_id: user.id, content, updated_at: new Date().toISOString() },
+      { onConflict: "user_id" }
+    ).select().single();
     setSaving(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
+    if (error) { toast.error(error.message); return; }
     setResume(data);
-    toast.success("Resume saved.");
-  };
+    toast.success("Draft saved.");
+  }, [content, supabase, user]);
 
-  const handleATSScore = async () => {
-    if (!user || !content.trim()) {
-      toast.error("Add resume content first.");
-      return;
-    }
-
+  const handleATSScore = useCallback(async () => {
+    if (!user || !content.trim()) { toast.error("Add resume content first."); return; }
     setScoring(true);
-
     try {
       const analysis = await optimizeResumeRequest({
         content,
         targetRole: undefined,
         industry: profile?.industry || undefined,
       });
-
-      const { data, error } = await supabase
-        .from("resumes")
-        .upsert(
-          {
-            user_id: user.id,
-            content,
-            ats_score: analysis.overallScore,
-            ats_analysis: analysis,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id" }
-        )
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
+      const { data, error } = await supabase.from("resumes").upsert(
+        { user_id: user.id, content, ats_score: analysis.overallScore, ats_analysis: analysis, updated_at: new Date().toISOString() },
+        { onConflict: "user_id" }
+      ).select().single();
+      if (error) throw error;
       setResume(data);
       toast.success(`ATS score updated to ${analysis.overallScore}/100.`);
     } catch (error) {
-      logAppError("[RESUME AI] Failed to score resume:", error);
+      logAppError("[RESUME AI] Failed to score:", error);
       toast.error(error instanceof Error ? error.message : "Failed to score resume.");
-    } finally {
-      setScoring(false);
-    }
-  };
+    } finally { setScoring(false); }
+  }, [content, profile, supabase, user]);
 
   const ats = resume?.ats_analysis;
 
   if (loading) {
-    return <ResumeSkeleton />;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <span className="text-3xl" style={{ color: "hsl(var(--kriya-primary))", animation: "kriya-glyph-pulse 2.4s ease-in-out infinite" }}>◈</span>
+          <p className="kriya-label">Loading signal lab</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="glass-panel-strong relative overflow-hidden border-white/10">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.14),transparent_20%)]" />
-        <CardContent className="relative p-6 sm:p-8">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_340px]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-cyan-100">
-                <Sparkles className="h-3.5 w-3.5" />
-                Resume lab
-              </div>
-              <h1 className="mt-5 text-4xl font-semibold text-white sm:text-5xl">
-                Improve the signal your
-                <span className="text-gradient-premium"> resume sends</span>.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                Write or paste your resume, save it as your working draft, and let AI
-                score structure, keyword alignment, and execution strength.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button type="button" variant="outline" onClick={handleSave} disabled={saving}>
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  {saving ? "Saving..." : "Save draft"}
-                </Button>
-                <Button type="button" onClick={handleATSScore} disabled={scoring}>
-                  {scoring ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-4 w-4" />
-                  )}
-                  {scoring ? "Scoring..." : "Run AI analysis"}
-                </Button>
-              </div>
-            </div>
+    <div className="mx-auto max-w-4xl space-y-0">
 
-            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-              {[
-                {
-                  label: "Current ATS",
-                  value: ats?.overallScore ? `${ats.overallScore}/100` : "Not scored",
-                  tone: "text-cyan-100",
-                },
-                {
-                  label: "Industry fit",
-                  value: profile?.industry || "Not set",
-                  tone: "text-slate-100",
-                },
-                {
-                  label: "Draft status",
-                  value: content.trim() ? "Active" : "Empty",
-                  tone: "text-violet-100",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-[1.35rem] border border-white/10 bg-white/[0.05] p-4"
-                >
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-                    {item.label}
-                  </p>
-                  <p className={`mt-3 text-2xl font-semibold ${item.tone}`}>{item.value}</p>
-                </div>
-              ))}
-            </div>
+      {/* ─── Header ─────────────────────────────────────────────── */}
+      <section className="py-8 sm:py-10">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div>
+            <p className="kriya-label mb-3">Signal Lab</p>
+            <h2 className="kriya-serif text-3xl sm:text-4xl font-light text-white leading-tight">
+              Sharpen the signal your <span className="text-gradient-premium">resume sends</span>.
+            </h2>
+            <p className="mt-3 text-sm text-slate-400 leading-relaxed max-w-xl">
+              Write or paste your resume, save it as your working draft, and let AI score structure, keyword alignment, and execution strength.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] text-slate-500 shrink-0">
+            <span>ATS: <span className="text-slate-300 font-medium">{ats?.overallScore ? `${ats.overallScore}/100` : "—"}</span></span>
+            <span>Industry: <span className="text-slate-300">{profile?.industry || "Not set"}</span></span>
+            <span>Draft: <span className={content.trim() ? "text-emerald-300" : "text-slate-500"}>{content.trim() ? "Active" : "Empty"}</span></span>
+          </div>
+        </div>
+      </section>
 
-      <Card className="border-white/10">
-        <CardHeader>
-          <CardTitle className="text-white">Resume editor</CardTitle>
-          <CardDescription>
-            Paste your full draft below. Include summary, experience, projects, skills,
-            and measurable outcomes where possible.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            placeholder="Paste or write your resume here. Include professional summary, work experience, projects, skills, and education."
-            className="min-h-[440px] resize-y font-mono text-sm leading-7"
-          />
-        </CardContent>
-      </Card>
+      <div className="kriya-divider" />
 
+      {/* ─── Editor ─────────────────────────────────────────────── */}
+      <section className="py-8">
+        <Textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Paste or write your resume here. Include professional summary, work experience, projects, skills, and education."
+          className="min-h-[400px] resize-y font-mono text-sm leading-7 bg-white/[0.01] border-white/[0.05] focus:border-white/[0.12] rounded-xl"
+        />
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button onClick={handleSave} disabled={saving} variant="outline" className="rounded-xl bg-transparent border-white/[0.08] hover:bg-white/[0.03]">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? "Saving..." : "Save draft"}
+          </Button>
+          <Button onClick={handleATSScore} disabled={scoring} className="rounded-xl">
+            {scoring ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {scoring ? "Scoring..." : "Run AI analysis"}
+          </Button>
+        </div>
+      </section>
+
+      {/* ─── ATS Analysis Results ───────────────────────────────── */}
       {ats ? (
-        <div className="space-y-6">
-          <Card className="border-white/10">
-            <CardContent className="grid gap-6 p-6 md:grid-cols-[160px_minmax(0,1fr)]">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.05] p-5 text-center">
-                <p
-                  className={`text-5xl font-semibold ${
-                    ats.overallScore >= 70
-                      ? "text-emerald-300"
-                      : ats.overallScore >= 50
-                        ? "text-amber-200"
-                        : "text-rose-200"
-                  }`}
-                >
+        <>
+          <div className="kriya-divider" />
+
+          {/* Score + Summary */}
+          <section className="py-8">
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="shrink-0 text-center">
+                <p className={cn(
+                  "kriya-serif text-5xl font-light",
+                  ats.overallScore >= 70 ? "text-emerald-300" : ats.overallScore >= 50 ? "text-amber-200" : "text-rose-200"
+                )}>
                   {ats.overallScore}
                 </p>
-                <p className="mt-3 text-xs uppercase tracking-[0.24em] text-slate-500">
-                  ATS score
-                </p>
+                <p className="mt-2 kriya-label">ATS Score</p>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5">
-                <p className="text-sm leading-7 text-slate-300">{ats.summary}</p>
+              <div className="rounded-xl border border-white/[0.04] bg-white/[0.01] p-5 flex-1">
+                <p className="text-sm leading-7 text-slate-400">{ats.summary}</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          <div className="grid gap-4 xl:grid-cols-2">
-            {Object.entries(ats.sections || {}).map(([key, section], index) => (
+          {/* Section Breakdown — Editorial list, no cards */}
+          <div className="kriya-divider" />
+          <motion.section variants={vishnuContainer} initial="hidden" animate="visible" className="py-8 space-y-4">
+            <p className="kriya-label mb-4">Section breakdown</p>
+            {Object.entries(ats.sections || {}).map(([key, section]) => (
               <motion.div
                 key={key}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.04 }}
+                variants={vishnuItem}
+                className="rounded-xl border border-white/[0.03] bg-white/[0.01] p-5"
               >
-                <Card className="h-full border-white/10">
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-                          {key}
-                        </p>
-                        <p className="mt-2 text-2xl font-semibold text-white">
-                          {section.score}%
-                        </p>
-                      </div>
-                      <Badge
-                        className={
-                          section.score >= 70
-                            ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                            : section.score >= 50
-                              ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
-                              : "border-rose-400/20 bg-rose-400/10 text-rose-100"
-                        }
-                      >
-                        signal
-                      </Badge>
-                    </div>
-                    <div className="mt-4">
-                      <Progress value={section.score} className="h-2" />
-                    </div>
-                    <p className="mt-4 text-sm leading-7 text-slate-400">{section.tip}</p>
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-medium text-slate-300 capitalize">{key}</p>
+                    <span className={cn(
+                      "text-xs font-medium",
+                      section.score >= 70 ? "text-emerald-300" : section.score >= 50 ? "text-amber-200" : "text-rose-200"
+                    )}>
+                      {section.score}%
+                    </span>
+                  </div>
+                </div>
+                <div className="h-1 w-full rounded-full bg-white/[0.04] overflow-hidden mb-3">
+                  <div
+                    className={cn("h-full rounded-full",
+                      section.score >= 70 ? "bg-emerald-400/50" : section.score >= 50 ? "bg-amber-400/50" : "bg-rose-400/50"
+                    )}
+                    style={{ width: `${section.score}%` }}
+                  />
+                </div>
+                <p className="text-[13px] text-slate-400 leading-relaxed">{section.tip}</p>
 
-                    {section.found?.length ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {section.found.slice(0, 4).map((keyword) => (
-                          <Badge
-                            key={keyword}
-                            className="border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                          >
-                            <CheckCircle2 className="mr-1 h-3 w-3" />
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
-
-                    {section.missing?.length ? (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {section.missing.slice(0, 4).map((keyword) => (
-                          <Badge
-                            key={keyword}
-                            className="border-rose-400/20 bg-rose-400/10 text-rose-100"
-                          >
-                            <XCircle className="mr-1 h-3 w-3" />
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
-                  </CardContent>
-                </Card>
+                {(section.found?.length || section.missing?.length) ? (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {section.found?.slice(0, 4).map((kw) => (
+                      <span key={kw} className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/8 px-2 py-0.5 text-[10px] text-emerald-200">
+                        <CheckCircle2 className="h-2.5 w-2.5" />{kw}
+                      </span>
+                    ))}
+                    {section.missing?.slice(0, 4).map((kw) => (
+                      <span key={kw} className="inline-flex items-center gap-1 rounded-full border border-rose-400/20 bg-rose-400/8 px-2 py-0.5 text-[10px] text-rose-200">
+                        <XCircle className="h-2.5 w-2.5" />{kw}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </motion.div>
             ))}
-          </div>
+          </motion.section>
 
+          {/* Top Suggestions */}
           {ats.topSuggestions?.length ? (
-            <Card className="border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white">Top AI suggestions</CardTitle>
-                <CardDescription>
-                  Highest-leverage changes to improve recruiter clarity and ATS fit.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {ats.topSuggestions.map((suggestion, index) => (
-                  <div
-                    key={`${suggestion}-${index}`}
-                    className="flex items-start gap-3 rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-500/15 text-xs font-semibold text-violet-100">
-                      {index + 1}
+            <>
+              <div className="kriya-divider" />
+              <section className="py-8">
+                <p className="kriya-label mb-4">Top AI suggestions</p>
+                <div className="space-y-2">
+                  {ats.topSuggestions.map((suggestion, index) => (
+                    <div key={`${suggestion}-${index}`} className="flex items-start gap-3 rounded-xl border border-white/[0.03] bg-white/[0.01] p-4">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.04] text-[10px] font-medium text-slate-400 shrink-0">
+                        {index + 1}
+                      </span>
+                      <p className="text-[13px] text-slate-400 leading-relaxed">{suggestion}</p>
                     </div>
-                    <p className="text-sm leading-7 text-slate-300">{suggestion}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                  ))}
+                </div>
+              </section>
+            </>
           ) : null}
-        </div>
+        </>
       ) : (
-        <Card className="border-dashed border-white/10 bg-white/[0.03]">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[1.35rem] bg-gradient-to-br from-violet-500/20 to-cyan-400/20 text-cyan-100">
-              <FileText className="h-7 w-7" />
-            </div>
-            <h2 className="mt-6 text-2xl font-semibold text-white">No AI analysis yet</h2>
-            <p className="mt-3 max-w-md text-sm leading-7 text-slate-400">
-              Save a draft and run AI analysis to see ATS scoring, missing signals, and
-              the highest-leverage improvements for your next application cycle.
+        <>
+          <div className="kriya-divider" />
+          <section className="py-14 text-center">
+            <FileText className="h-8 w-8 mx-auto text-slate-600" />
+            <h3 className="mt-4 kriya-serif text-xl font-light text-white">No analysis yet</h3>
+            <p className="mt-2 text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+              Save a draft and run AI analysis to see ATS scoring, missing signals, and the highest-leverage improvements.
             </p>
-            <Button type="button" className="mt-6" onClick={handleATSScore} disabled={scoring}>
+            <Button onClick={handleATSScore} disabled={scoring} className="mt-5 rounded-xl">
               {scoring ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               {scoring ? "Scoring..." : "Run AI analysis"}
             </Button>
-          </CardContent>
-        </Card>
+          </section>
+        </>
       )}
     </div>
   );

@@ -153,3 +153,49 @@ export interface Application {
   applied_at: string | null;
   created_at: string;
 }
+
+// ════════════════════════════════════════════════
+// Career-Ops Types
+// ════════════════════════════════════════════════
+
+export type CareerOpsStatus =
+  | "Evaluated"
+  | "Applied"
+  | "Responded"
+  | "Interview"
+  | "Offer"
+  | "Rejected"
+  | "Discarded"
+  | "SKIP";
+
+// CareerEvaluation and EvaluationBlock removed — dead types superseded by CareerReport + CareerTrackerEntry
+
+export interface PipelineEntry {
+  url: string;
+  source: string;
+  status: "pending" | "processing" | "evaluated" | "error";
+  addedAt: string;
+}
+
+export interface CareerTrackerEntry {
+  number: number;
+  date: string;
+  company: string;
+  role: string;
+  score: string;
+  status: CareerOpsStatus;
+  hasPdf: boolean;
+  reportLink: string;
+  notes: string;
+}
+
+export interface CareerReport {
+  slug: string;
+  fileName: string;
+  company: string;
+  role: string;
+  date: string;
+  score: number;
+  archetype: string;
+  content: string;
+}

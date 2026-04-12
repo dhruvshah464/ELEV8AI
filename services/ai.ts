@@ -458,7 +458,7 @@ export function generatePromptFallback(prompt: string) {
     .filter(Boolean)
     .slice(0, 3);
 
-  if (condensed.includes("career execution coach") || condensed.includes("elev8 mentor")) {
+  if (condensed.includes("career execution coach") || condensed.includes("kriya mentor")) {
     const latestMessageLower = latestUserMessage.toLowerCase();
     const roleMatch = profileSummary.match(/(?:targeting|for|as)\s+([A-Za-z /-]{3,40})/i);
     const roleSignal = roleMatch?.[1]?.trim();

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
+import { KriyaModeProvider } from "@/contexts/kriya-mode-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AppBackground } from "@/components/core/app-background";
@@ -19,10 +20,16 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-display",
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-serif",
+});
+
 export const metadata: Metadata = {
-  title: "ELEV8.AI – AI Career Execution Engine",
+  title: "KRIYA — Decision & Execution OS",
   description:
-    "We don't help you prepare — we help you get hired. AI-powered career execution system.",
+    "A cinematic, philosophy-driven execution operating system. AI-powered career intelligence, strategic decision-making, and guided action.",
 };
 
 export default function RootLayout({
@@ -31,21 +38,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark" data-kriya-mode="vishnu" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${cormorant.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <AuthProvider>
-            <SmoothScroller>
-              <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-                <AppBackground />
-                <PageTransition>{children}</PageTransition>
-                <CommandPalette />
-                <Toaster richColors position="top-right" />
-              </div>
-            </SmoothScroller>
-          </AuthProvider>
+          <KriyaModeProvider>
+            <AuthProvider>
+              <SmoothScroller>
+                <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+                  <AppBackground />
+                  <PageTransition>{children}</PageTransition>
+                  <CommandPalette />
+                  <Toaster richColors position="top-right" />
+                </div>
+              </SmoothScroller>
+            </AuthProvider>
+          </KriyaModeProvider>
         </ThemeProvider>
       </body>
     </html>

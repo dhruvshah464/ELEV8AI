@@ -321,7 +321,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               Loading
             </p>
             <p className="mt-1 text-sm text-slate-300">
-              Preparing your secure ELEV8 access flow.
+              Preparing your secure KRIYA access flow.
             </p>
           </div>
         </div>
@@ -344,7 +344,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               for your career.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-300">
-              ELEV8.AI blends planning, execution, and live AI guidance into one
+              KRIYA blends planning, execution, and live AI guidance into one
               focused workspace designed to move users from intent to offers.
             </p>
 
@@ -366,7 +366,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
 
         <div className="w-full max-w-md justify-self-center lg:max-w-none">
           <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-gradient-premium">ELEV8.AI</h1>
+            <h1 className="text-4xl font-bold text-gradient-premium">KRIYA</h1>
             <p className="mt-2 text-sm text-slate-400">
               Your AI Career Execution Engine
             </p>

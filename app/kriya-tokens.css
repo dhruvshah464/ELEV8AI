@@ -1,0 +1,271 @@
+/* ═════════════════════════════════════════════
+   KRIYA OS — Design Token System
+   Three Modes: Krishna (Guidance), Vishnu (Order), Shiva (Transformation)
+   ═════════════════════════════════════════════ */
+
+/* ── Default: Vishnu Mode (Order) ────────────── */
+:root,
+[data-kriya-mode="vishnu"] {
+  /* Primary palette — sovereign blue + regal gold */
+  --kriya-primary: 213 94% 58%;
+  --kriya-primary-soft: 213 70% 42%;
+  --kriya-accent: 45 93% 60%;
+  --kriya-accent-soft: 45 70% 45%;
+  --kriya-surface: 226 39% 7%;
+  --kriya-surface-raised: 226 36% 10%;
+  --kriya-surface-overlay: 226 30% 14%;
+  --kriya-text-primary: 210 40% 98%;
+  --kriya-text-secondary: 215 20% 65%;
+  --kriya-text-muted: 215 15% 45%;
+  --kriya-border: 226 20% 18%;
+  --kriya-border-subtle: 226 20% 13%;
+  --kriya-glow: 213 94% 58%;
+  --kriya-glow-opacity: 0.15;
+
+  /* Gradient stops */
+  --kriya-gradient-start: rgba(59, 130, 246, 0.18);
+  --kriya-gradient-mid: rgba(59, 130, 246, 0.06);
+  --kriya-gradient-end: rgba(250, 204, 21, 0.08);
+  --kriya-gradient-ambient: rgba(59, 130, 246, 0.04);
+
+  /* Motion */
+  --kriya-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --kriya-duration-fast: 180ms;
+  --kriya-duration-normal: 320ms;
+  --kriya-duration-slow: 600ms;
+  --kriya-spring-damping: 22;
+  --kriya-spring-stiffness: 260;
+
+  /* Glass */
+  --kriya-glass-bg: rgba(255, 255, 255, 0.02);
+  --kriya-glass-border: rgba(255, 255, 255, 0.05);
+  --kriya-glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --kriya-glass-blur: 24px;
+
+  /* Scrollbar */
+  --kriya-scrollbar-track: rgba(15, 23, 42, 0.3);
+  --kriya-scrollbar-thumb-start: rgba(59, 130, 246, 0.55);
+  --kriya-scrollbar-thumb-end: rgba(250, 204, 21, 0.45);
+
+  /* Score colors */
+  --kriya-score-high: 160 84% 39%;
+  --kriya-score-mid: 45 93% 60%;
+  --kriya-score-low: 0 84% 60%;
+
+  /* Status colors (shared) */
+  --kriya-status-active: 160 84% 45%;
+  --kriya-status-pending: 45 93% 60%;
+  --kriya-status-error: 0 84% 60%;
+  --kriya-status-info: 213 94% 58%;
+}
+
+/* ── Krishna Mode (Guidance) ─────────────────── */
+[data-kriya-mode="krishna"] {
+  /* Primary palette — warm saffron + divine gold */
+  --kriya-primary: 38 92% 65%;
+  --kriya-primary-soft: 38 70% 48%;
+  --kriya-accent: 24 95% 52%;
+  --kriya-accent-soft: 24 75% 40%;
+  --kriya-surface: 30 20% 6%;
+  --kriya-surface-raised: 30 18% 9%;
+  --kriya-surface-overlay: 30 15% 13%;
+  --kriya-text-primary: 38 40% 96%;
+  --kriya-text-secondary: 30 20% 62%;
+  --kriya-text-muted: 30 12% 42%;
+  --kriya-border: 30 18% 16%;
+  --kriya-border-subtle: 30 18% 11%;
+  --kriya-glow: 38 92% 65%;
+  --kriya-glow-opacity: 0.12;
+
+  /* Gradient stops */
+  --kriya-gradient-start: rgba(245, 180, 60, 0.16);
+  --kriya-gradient-mid: rgba(245, 180, 60, 0.05);
+  --kriya-gradient-end: rgba(220, 120, 30, 0.10);
+  --kriya-gradient-ambient: rgba(245, 180, 60, 0.03);
+
+  /* Motion — gentle, guiding */
+  --kriya-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --kriya-duration-fast: 220ms;
+  --kriya-duration-normal: 400ms;
+  --kriya-duration-slow: 800ms;
+  --kriya-spring-damping: 30;
+  --kriya-spring-stiffness: 160;
+
+  /* Glass — warmer tint */
+  --kriya-glass-bg: rgba(245, 180, 60, 0.02);
+  --kriya-glass-border: rgba(245, 180, 60, 0.06);
+  --kriya-glass-shadow: 0 12px 40px rgba(20, 10, 0, 0.45);
+  --kriya-glass-blur: 28px;
+
+  /* Scrollbar */
+  --kriya-scrollbar-track: rgba(30, 20, 10, 0.3);
+  --kriya-scrollbar-thumb-start: rgba(245, 180, 60, 0.5);
+  --kriya-scrollbar-thumb-end: rgba(220, 120, 30, 0.4);
+
+  /* Score */
+  --kriya-score-high: 38 92% 55%;
+  --kriya-score-mid: 24 80% 50%;
+  --kriya-score-low: 0 70% 55%;
+}
+
+/* ── Shiva Mode (Transformation) ─────────────── */
+[data-kriya-mode="shiva"] {
+  /* Primary palette — cosmic violet + ash silver */
+  --kriya-primary: 258 90% 62%;
+  --kriya-primary-soft: 258 65% 48%;
+  --kriya-accent: 0 0% 78%;
+  --kriya-accent-soft: 0 0% 55%;
+  --kriya-surface: 260 20% 5%;
+  --kriya-surface-raised: 260 18% 8%;
+  --kriya-surface-overlay: 260 14% 12%;
+  --kriya-text-primary: 260 20% 96%;
+  --kriya-text-secondary: 260 12% 62%;
+  --kriya-text-muted: 260 8% 40%;
+  --kriya-border: 260 16% 16%;
+  --kriya-border-subtle: 260 16% 10%;
+  --kriya-glow: 258 90% 62%;
+  --kriya-glow-opacity: 0.20;
+
+  /* Gradient stops */
+  --kriya-gradient-start: rgba(139, 92, 246, 0.22);
+  --kriya-gradient-mid: rgba(139, 92, 246, 0.06);
+  --kriya-gradient-end: rgba(200, 200, 200, 0.06);
+  --kriya-gradient-ambient: rgba(139, 92, 246, 0.05);
+
+  /* Motion — explosive, spring-loaded */
+  --kriya-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --kriya-duration-fast: 120ms;
+  --kriya-duration-normal: 240ms;
+  --kriya-duration-slow: 480ms;
+  --kriya-spring-damping: 12;
+  --kriya-spring-stiffness: 400;
+
+  /* Glass — ash-tinted */
+  --kriya-glass-bg: rgba(139, 92, 246, 0.03);
+  --kriya-glass-border: rgba(139, 92, 246, 0.08);
+  --kriya-glass-shadow: 0 16px 50px rgba(10, 0, 20, 0.5);
+  --kriya-glass-blur: 20px;
+
+  /* Scrollbar */
+  --kriya-scrollbar-track: rgba(20, 10, 30, 0.3);
+  --kriya-scrollbar-thumb-start: rgba(139, 92, 246, 0.6);
+  --kriya-scrollbar-thumb-end: rgba(200, 200, 200, 0.35);
+
+  /* Score */
+  --kriya-score-high: 258 80% 55%;
+  --kriya-score-mid: 0 0% 65%;
+  --kriya-score-low: 0 72% 58%;
+}
+
+/* ════════════════════════════════════════════════
+   KRIYA — Mode-Aware Utility Classes
+   ════════════════════════════════════════════════ */
+
+/* Gradient text — adapts to mode */
+.text-gradient-kriya {
+  background-image: linear-gradient(
+    120deg,
+    hsl(var(--kriya-text-primary)) 0%,
+    hsl(var(--kriya-primary)) 40%,
+    hsl(var(--kriya-accent)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Glass panels — mode-aware */
+.kriya-glass {
+  background: var(--kriya-glass-bg);
+  border: 1px solid var(--kriya-glass-border);
+  backdrop-filter: blur(var(--kriya-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kriya-glass-blur));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    var(--kriya-glass-shadow);
+}
+
+.kriya-glass-strong {
+  background: hsl(var(--kriya-surface-raised) / 0.6);
+  border: 1px solid var(--kriya-glass-border);
+  backdrop-filter: blur(calc(var(--kriya-glass-blur) + 8px));
+  -webkit-backdrop-filter: blur(calc(var(--kriya-glass-blur) + 8px));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.02),
+    var(--kriya-glass-shadow);
+}
+
+/* Glow effect */
+.kriya-glow {
+  box-shadow: 0 0 30px hsl(var(--kriya-glow) / var(--kriya-glow-opacity));
+}
+
+.kriya-glow-text {
+  text-shadow: 0 0 20px hsl(var(--kriya-glow) / var(--kriya-glow-opacity));
+}
+
+/* Score color utilities */
+.kriya-score-high { color: hsl(var(--kriya-score-high)); }
+.kriya-score-mid { color: hsl(var(--kriya-score-mid)); }
+.kriya-score-low { color: hsl(var(--kriya-score-low)); }
+
+/* ════════════════════════════════════════════════
+   KRIYA — Mode-Specific Keyframes
+   ════════════════════════════════════════════════ */
+
+/* Krishna — gentle glow breathing */
+@keyframes krishna-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(38 92% 65% / 0.08); }
+  50% { box-shadow: 0 0 40px hsl(38 92% 65% / 0.18); }
+}
+
+/* Vishnu — precise structural pulse */
+@keyframes vishnu-pulse {
+  0%, 100% { border-color: hsl(213 94% 58% / 0.08); }
+  50% { border-color: hsl(213 94% 58% / 0.25); }
+}
+
+/* Shiva — destructive dissolve */
+@keyframes shiva-dissolve {
+  0% { opacity: 1; transform: scale(1); filter: blur(0px); }
+  50% { opacity: 0.3; transform: scale(0.97); filter: blur(2px); }
+  100% { opacity: 0; transform: scale(0.94); filter: blur(6px); }
+}
+
+/* Shiva — reconstruction build */
+@keyframes shiva-construct {
+  0% { opacity: 0; transform: scale(1.06); filter: blur(6px); }
+  50% { opacity: 0.6; transform: scale(1.02); filter: blur(2px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+}
+
+/* Shiva — energy crackle on borders */
+@keyframes shiva-crackle {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(258 90% 62% / 0); }
+  25% { box-shadow: 0 0 12px 2px hsl(258 90% 62% / 0.3); }
+  50% { box-shadow: 0 0 2px 0 hsl(258 90% 62% / 0.1); }
+  75% { box-shadow: 0 0 18px 3px hsl(258 90% 62% / 0.25); }
+}
+
+/* Universal — smooth entry */
+@keyframes kriya-enter {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kriya-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Mode transition overlay */
+@keyframes mode-transition {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.kriya-mode-transition {
+  animation: mode-transition 600ms var(--kriya-ease) forwards;
+}

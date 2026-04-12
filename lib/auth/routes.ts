@@ -6,6 +6,10 @@ export const PROTECTED_PATHS = [
   "/tasks",
   "/resume",
   "/interview",
+  "/career",
+  "/career/pipeline",
+  "/career/evaluate",
+  "/career/tracker",
 ] as const;
 export const ONBOARDING_PATH = "/onboarding";
 export const DEFAULT_AUTHENTICATED_PATH = "/dashboard";

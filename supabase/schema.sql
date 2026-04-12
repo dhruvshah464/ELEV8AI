@@ -1,5 +1,5 @@
 -- ============================================
---  ELEV8.AI — Supabase Postgres Schema
+--  KRIYA — Supabase Postgres Schema
 -- ============================================
 
 -- 1. PROFILES (extends auth.users)

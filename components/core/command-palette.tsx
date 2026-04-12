@@ -54,7 +54,7 @@ const commands: CommandItem[] = [
   {
     label: "Login",
     href: "/login",
-    description: "Sign into ELEV8.AI",
+    description: "Sign into KRIYA",
   },
   {
     label: "Sign Up",
@@ -122,7 +122,7 @@ export function CommandPalette() {
           <DialogHeader className="border-b border-white/10 px-6 py-5">
             <DialogTitle className="text-xl text-white">Command Palette</DialogTitle>
             <DialogDescription className="text-slate-400">
-              Jump anywhere in ELEV8.AI with one command.
+              Jump anywhere in KRIYA with one command.
             </DialogDescription>
           </DialogHeader>
 

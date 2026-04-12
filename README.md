@@ -1,208 +1,169 @@
 <div align="center">
-  
-  <img src="public/kriya-logo.png" alt="KRIYA Shield" width="120" style="margin-bottom: 24px; filter: drop-shadow(0 0 20px rgba(201,168,76,0.3));" />
 
-  <h1 style="font-size: 3rem; font-weight: 200; letter-spacing: 0.1em; margin: 0;">K R I Y A</h1>
-  <p style="font-family: monospace; letter-spacing: 0.3em; color: #C9A84C; margin-top: 10px; font-size: 0.8rem;">
-    THE COSMIC EXECUTION ENGINE
-  </p>
+# K R I Y A · O S
 
-  <br />
+**The Cosmic Execution Engine**
 
-  [![Next.js](https://img.shields.io/badge/Next_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](#)
-  [![React](https://img.shields.io/badge/React_19-000000?style=for-the-badge&logo=react&logoColor=4A9BD9)](#)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-000000?style=for-the-badge&logo=typescript&logoColor=3178C6)](#)
-  [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-000000?style=for-the-badge&logo=tailwindcss&logoColor=white)](#)
-  [![Framer Motion](https://img.shields.io/badge/Framer_Motion-000000?style=for-the-badge&logo=framer&logoColor=white)](#)
-  [![Supabase](https://img.shields.io/badge/Supabase-000000?style=for-the-badge&logo=supabase&logoColor=3ECF8E)](#)
+> *"Action is greater than inaction. Perform therefore thy task in life."*  
+> — **Bhagavad Gita 3.8**
 
-  <br />
+<br/>
 
-<<<<<<< HEAD
-[Deploy to Vercel](https://vercel.com/new) • [View Demo]() • [Report Issue](https://github.com/DevGoyalG/JobGeniusAI/issues)
-=======
-  <p style="font-size: 1.1rem; color: #9CA3AF; max-w-2xl text-center font-style: italic;">
-    “Action is greater than inaction. Perform therefore thy task in life.”<br />
-    <span style="font-size: 0.8rem; letter-spacing: 0.1em; color: #8B7635;">— BHAGAVAD GITA 3.8</span>
-  </p>
->>>>>>> f8cee98 (KRIYA)
+**Next.js 15** · **React 19** · **TypeScript** · **Tailwind CSS** · **Framer Motion** · **Supabase** · **Google Gemini** · **Playwright**
+
+---
 
 </div>
 
----
+## 🌌 System ArchitectureOverview
 
-## 👁️ The Architecture of Action
+**KRIYA** is a production-grade, AI-powered career execution ecosystem. Designed for the modern operator, it bypasses the traditional, soulless SaaS dashboard paradigm in favor of a cinematic, philosophy-driven decision interface. 
 
-**KRIYA** is a production-grade SaaS framework that rejects traditional data representation. Moving away from disjointed grids, white cards, and borders, KRIYA utilizes **typography-led design, spatial breathing room, and dynamic state dissolution**. 
+To achieve massive scale and execution, the repository is **strictly bifurcated** into two symbiotic halves:
 
-It is built for the modern Arjuna: operators, engineers, and visionaries navigating complex professional battlefields. We replace the "dashboard" with an **Oracle Interface** and a sequenced **Action Engine**.
-
-### 🏛️ Philosophical Design Tokens
-
-The UI dynamically reacts and reshapes itself based on the intent of the user, rooted in triadic Indian philosophy:
-
-*   **VISHNU LAYER (The Preserver):** Deep indigos, structured grids, calm geometry. Used in the `/knowledge` and `/clarity` views to optimize signal-to-noise ratio when analyzing data.
-*   **SHIVA LAYER (The Transformer):** Void blacks, organic noise, crimson embers. Used in the `/transform` view and during state transitions. When tasks are destroyed (completed), they do not disappear—they dissolve into particles, mapped to the Shiva aesthetic.
-*   **KARMA LAYER (The Action):** Saffron and Gold. Used exclusively in the `/action` queue to denote forward momentum and active execution.
+1. **KRIYA (The Frontend OS):** The psychological, strategic, and visual interface where decisions are made.
+2. **Career-Ops (The Agentic Engine):** The ruthless backend automation machinery that executes on the real world.
 
 ---
 
-## ⚙️ Core Technical Specifications
+## 🏛️ PART I: KRIYA — The Operating System
 
-### ⚡ 60 FPS Cinematic Rendering
-Achieving a completely stable 60 FPS on mid-range devices while running heavy visual effects:
-*   **Zero-JS Backgrounds:** All particle systems, nebula glows, and celestial dust are computed via pure CSS `@keyframes`, eliminating React hydration and render cycle overhead.
-*   **Static DOM Sacred Geometry:** The Sri Yantra and Chakra rings are aggressively optimized using `React.memo` with pre-computed trigonometric points to prevent scroll-linked repaints.
-*   **GPU Composition:** Strict avoidance of real-time `filter: blur()` during scroll interpolation (Lenis). Transitions use `will-change: transform` directly pushed to the GPU compositor.
+*The strategic command center. This is what you see, feel, and interact with.*
 
-### 🧠 The Oracle Interface (`CommandInput`)
-Traditional SaaS relies on sidebars and disjointed pages. KRIYA centralizes routing through an Oracle-style text interface. You declare your intent, and the intelligence engine routes you into the appropriate spatial view.
+### What KRIYA Does
+KRIYA acts as your cognitive layer. It is built to organize your career goals, manage your mental state during the job hunt, and provide a cinematic environment to formulate strategy.
 
-### 🔥 Shiva Dissolution Transitions (`<ShivaTransition />`)
-State changes shouldn't "jump." We built custom Framer Motion variants that trigger morphological dissolution. Completing a task triggers an ember-scatter effect against a localized crimson vignette, emphasizing the permanent transformation of that data.
-
----
-
-## 🌌 The 5 SaaS Modalities
-
-1.  **`/dashboard` (Command Center):** The central nexus. Features the Oracle Input and the massive `<VishnuRing />` (a CSS-animated execution score visualizer). 
-2.  **`/clarity`:** Replaces the messy backlog. A strict, 3-column, typography-led breakdown of **Options**, **Risks**, and **Actions**.
-3.  **`/action`:** The Execution Engine. Strips away the to-do list for a vertical timeline timeline. Execute sequentially. 
-4.  **`/transform`:** A split-screen diagnostic. Left: What has been destroyed (past obstacles). Right: What is being reborn (emerging capabilities). 
-5.  **`/knowledge`:** The observation deck. Auto-generates "insights" and text-patterns dynamically based on what you have accomplished, rendered across Vishnu grids.
+- **Philosophical Modalities:** The UI physically transforms based on your current psychological need.
+  - 🟡 **Krishna (Guidance):** Warm gold. Mentorship, learning, and finding direction out of chaos.
+  - 🔵 **Vishnu (Order):** Sovereign blue. Structure, clarity, planning, and cosmic precision.
+  - 🟣 **Shiva (Transformation):** Cosmic violet. Deep work, intensive execution, and the destruction of the false.
+- **Cinematic Execution:** Targets 60 FPS motion-driven interactions using Framer Motion, Lenis smooth scrolling, and GPU-composited CSS particle systems to keep cognitive load low and engagement high.
+- **Core SaaS Modules:**
+  - `Command`: An Oracle-style conversational interface powered by Google Gemini.
+  - `Clarity (Mission)`: Strategic mission building and long-term trajectory mapping.
+  - `Action (Tasks)`: Sequential action execution with state-driven visual feedback.
+  - `Signal (Resume)`: A laboratory interface mapping out your ATS-optimization metrics.
+  - `Prepare (Interview)`: AI-generated simulation environments to test your edge.
 
 ---
 
-## 🛠️ Local Initiation
+## ⚙️ PART II: Career-Ops — The Agentic Engine
+
+*The automated action layer. This is the terminal-driven backend that fights the war.*
+
+### What Career-Ops Does
+Career-Ops is an autonomous terminal and file-driven backend integrated into the KRIYA project. It operates like an autonomous agent, systematically dismantling the job-application funnel.
+
+- **The Pipeline Manager:** You feed job URLs into the pipeline. Career-Ops queues them, reads them, and stages them for processing.
+- **Deep Agentic Evaluation:** Powered by LLMs, it deeply analyzes job descriptions, grading them across 10 unique dimensions (giving an A–F score), and aligns them against distinct career archetypes.
+- **Automated CV Compilation (PDF):** It utilizes Playwright headless browsers to autonomously generate pixel-perfect, highly tailored, ATS-compliant PDF resumes on-the-fly based on the evaluation data.
+- **Portal Intelligence:** Features an automated scanning engine optimized for massive company portals (Greenhouse, Lever, Ashby, Workday, and 40+ customized enterprise platforms) to filter the signal from the noise.
+- **The Tracker Database:** Maintains a local, git-ignored JSON intelligence database mapping the exact state, communications, and status of every single application in your pipeline.
+
+---
+
+## 🔗 The Bifurcation & Integration
+
+Though bifurcated in logic, KRIYA and Career-Ops stream seamlessly together to form one ecosystem. KRIYA acts as the read/write visualizer for Career-Ops's raw data engines.
+
+| User Intent in KRIYA | Career-Ops Execution | Data Interface |
+| :--- | :--- | :--- |
+| **"I want to apply here"** | Appends URL to processing queue | ⟷ `career-ops/data/pipeline.txt` |
+| **"Should I take this job?"** | Runs LLM evaluation and generates report | ⟷ Reads `career-ops/reports/*.md` |
+| **"Where do I stand?"** | Queries local JSON application datastore | ⟷ Syncs `career-ops/data/tracker.json` |
+| **"Generate my resume"** | Triggers headless Playwright execution | ⟷ Spawns `generate_cv.js` output |
+
+---
+
+## 🛠️ Technical Stack & Infrastructure
+
+| Layer | Technology |
+|-------|-----------|
+| **Core Framework** | Next.js 15 (App Router), React 19 |
+| **Animation/Motion** | Framer Motion, custom CSS keyframes, Lenis |
+| **Artificial Intelligence**| Google Gemini 2.5 API |
+| **Database & Auth** | Supabase (PostgreSQL) + Row Level Security, OTP Auth |
+| **Styling** | Tailwind CSS + custom Shadcn/UI integration |
+| **Agentic Framework** | Claude Code / OpenCode (`career-ops`) |
+| **Rendering Engine** | Playwright + HTML templating for PDF generation |
+
+---
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-*   Node.js 18+
-*   Supabase Account (for remote DB projection)
+- Node.js 18+ installed
+- A configured Supabase project
+- Google AI Studio API key (Gemini)
 
-### Ignition Sequence
+### System Installation
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/dhruvshah464/ELEV8AI.git kriya
 cd kriya
 
-# 2. Install dependencies (React 19 + Next.js 15)
+# 2. Install core dependencies
 npm install
 
-# 3. Configure environment variables
-# Duplicate .env.example to .env.local and populate Supabase keys
+# 3. Environment configuration
 cp .env.example .env.local
+# Edit .env.local with your Supabase and Gemini keys
 
-# 4. Initiate the local server
+# 4. Initialize Career-Ops engine (Optional but recommended)
+cp career-ops/config/profile.example.yml career-ops/config/profile.yml
+# Add your base markdown curriculum vitae to career-ops/cv.md
+
+# 5. Launch the cosmic engine
 npm run dev
 ```
-Navigate to `http://localhost:3000` to enter the platform.
+
+Navigate to `http://localhost:3000` to enter the Command Interface.
+
+### Environment Schema
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-key
+DATABASE_URL=your-database-url
+GEMINI_API_KEY=your-gemini-key
+CAREER_OPS_DIR=./career-ops
+```
 
 ---
 
-## 🧬 Repository Topography
+## 📂 Architectural Topology
 
 ```text
 kriya/
 ├── app/
-│   ├── (app)/               # Protected SaaS Routes (The Modalities)
-│   │   ├── action/          # Karma Engine
-│   │   ├── clarity/         # Vision / Risk assessment
-│   │   ├── dashboard/       # Oracle Command
-│   │   ├── knowledge/       # Vishnu Intelligence
-│   │   └── transform/       # Shiva State Changes
-│   └── (marketing)/         # The Cosmic Landing Experience
-├── components/
-│   ├── kriya/               # Sacred UI Primitives (VishnuRing, InsightBlock)
-│   └── core/                # Performance layers (SmoothScroller, Particles)
-└── lib/                     # Supabase & Utilities
+│   ├── (app)/               # Protected SaaS operating routes
+│   │   ├── career/          # Binds UI to Career-Ops (pipeline, evaluate, tracker)
+│   │   ├── dashboard/       # Command Interface (The Oracle)
+│   │   ├── interview/       # AI Interview Preparation parameters
+│   │   ├── mission/         # Clarity View implementation
+│   │   ├── resume/          # Signal Lab componentry
+│   │   └── tasks/           # Immediate Action Engine
+│   ├── api/                 # Sub-graph API routing
+│   └── (marketing)/         # Public-facing cinematic initiation sequence
+├── career-ops/              # ⚙️ The Autonomous Application Agent (MIT base)
+│   ├── modes/               # Sub-agent behavior definitions
+│   ├── data/                # Data structures (pipelines, tracker - gitignored)
+│   └── reports/             # Generated LLM analysis payload (gitignored)
+├── lib/                     # Data clients, motion primitives, system utils
+└── components/              # Atomic & complex React topologies
 ```
 
-<<<<<<< HEAD
-### 💎 Core Subsystems:
-- **Execution Engine**: A high-speed, status-aware task list that prioritizes high-leverage actions.
-- **AI Mentor (Live Sync)**: A streaming intelligence layer that provides tactical guidance based on your mission state.
-- **Signal Graph**: Real-time visualization of your "Hireability" metrics across industry relevance and execution consistency.
-
 ---
 
-## 🎨 Design Philosophy: "Less, but better."
+## ⚖️ Open Source Attribution
 
-We've completely overhauled the UI/UX to deliver a professional-grade workspace:
-- **Invisible UI**: Interfaces that disappear, leaving only your content and focus.
-- **Glassmorphism 2.0**: Subtle, multi-layered blur surfaces that feel like physical objects.
-- **Fluid Motion**: Powered by **Framer Motion** and **Lenis**, providing native-feel smooth scrolling and micro-interactions (hover-lifts, scale-clicks).
-- **Typography-First**: Strict adherence to Inter-Tight with custom tracking for maximum readability on high-density displays.
+The fundamental framework for the `career-ops/` module draws architectural inspiration from [career-ops](https://github.com/santifer/career-ops) by Santiago Fernández de Valderrama. It is licensed under MIT. Modifications and integrations exist to bridge it natively into KRIYA OS.
 
----
-
-## 🛠️ The Tech Stack
-
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Next.js 15 (App Router), React 19 |
-| **Animation** | Framer Motion & Lenis (Smooth Scroll) |
-| **Intelligence** | Google Gemini 1.5 Flash / Pro |
-| **Database** | Supabase (PostgreSQL) + Drizzle ORM |
-| **Styling** | Tailwind CSS (v4 ready) + Shadcn/UI |
-| **Auth** | Supabase Auth (Unified Session Management) |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites:
-- Node.js 18.x or higher
-- A Google AI Studio API Key (for Gemini)
-- A Supabase Project
-
-### Installation:
-
-1. **Clone & Enter**:
-   ```bash
-   git clone https://github.com/DevGoyalG/JobGeniusAI.git
-   cd JobGeniusAI
-   ```
-
-2. **Environment Configuration**:
-   Create a `.env.local` file with the following keys:
-   ```env
-   # Database & Auth (Supabase)
-   NEXT_PUBLIC_SUPABASE_URL=your_project_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_key
-
-   # AI Intelligence
-   GEMINI_API_KEY=your_google_ai_key
-   ```
-
-3. **Deploy Locally**:
-   ```bash
-   npm install --legacy-peer-deps
-   npm run dev
-   ```
-
----
-
-## 📐 Implementation Progress
-
-> [!NOTE]
-> Currently in **v0.5-beta (Redesign Phase)**. Core layout modules are stabilized.
-
-- [x] **Global Smooth Scroll** (Lenis Integration)
-- [x] **Glass Surface System** (Shared UI tokens)
-- [x] **AI Mentor Sync** (Streaming responses)
-- [x] **Execution Queue** (Priority task management)
-- [ ] **Advanced Resume Intelligence** (v0.6)
-- [ ] **Mission Analytics** (v0.7)
-
-=======
->>>>>>> f8cee98 (KRIYA)
 ---
 
 <div align="center">
-  
-  <p style="font-size: 1.2rem; letter-spacing: 0.2em; font-weight: 300;">"Lift yourself by your own efforts. You are your own friend, you are your own enemy."</p>
-  <p style="font-size: 0.8rem; letter-spacing: 0.3em; color: #8B7635;">DESIGNED FOR EXCELLENCE</p>
-
+  <p><i>Built in India. For the world. For all time.</i></p>
+  <p><b>"Lift yourself by your own efforts. You are your own friend, you are your own enemy."</b></p>
 </div>

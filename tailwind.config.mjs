@@ -5,6 +5,7 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./contexts/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -58,6 +59,15 @@ export default {
           900: "#121826",
           800: "#162033",
         },
+        kriya: {
+          primary: "hsl(var(--kriya-primary))",
+          "primary-soft": "hsl(var(--kriya-primary-soft))",
+          accent: "hsl(var(--kriya-accent))",
+          "accent-soft": "hsl(var(--kriya-accent-soft))",
+          surface: "hsl(var(--kriya-surface))",
+          "surface-raised": "hsl(var(--kriya-surface-raised))",
+          glow: "hsl(var(--kriya-glow))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -99,6 +109,14 @@ export default {
           "0%, 100%": { transform: "translate3d(0, 0, 0)" },
           "50%": { transform: "translate3d(0, -10px, 0)" },
         },
+        "kriya-enter": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "kriya-scale-in": {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -109,6 +127,8 @@ export default {
         shimmer: "shimmer 1.8s linear infinite",
         "border-pulse": "border-pulse 3.2s ease-in-out infinite",
         "float-slow": "float-slow 7s ease-in-out infinite",
+        "kriya-enter": "kriya-enter 0.5s var(--kriya-ease) forwards",
+        "kriya-scale-in": "kriya-scale-in 0.4s var(--kriya-ease) forwards",
       },
       boxShadow: {
         premium: "0 24px 60px rgba(0, 0, 0, 0.4)",

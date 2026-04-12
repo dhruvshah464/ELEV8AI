@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     const preferredType = parsed.data.type ?? "email";
-    const typesToTry = preferredType === "signup" ? ["signup", "email"] : ["email", "signup"];
+    const typesToTry: Array<"email" | "signup"> = preferredType === "signup" ? ["signup", "email"] : ["email", "signup"];
 
     let verificationError: string | null = null;
 

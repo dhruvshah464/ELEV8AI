@@ -135,7 +135,7 @@ export default function OnboardingPage() {
                 <span className="text-gradient-premium"> career engine</span>.
               </h1>
               <p className="mt-4 text-sm leading-7 text-slate-300">
-                This gives ELEV8 enough signal to personalize your dashboard, task queue,
+                This gives KRIYA enough signal to personalize your dashboard, task queue,
                 mentor guidance, resume analysis, and interview loops from day one.
               </p>
 

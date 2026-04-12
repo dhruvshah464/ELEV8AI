@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState, useCallback, useRef, memo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   Brain,
@@ -22,11 +22,10 @@ import {
   generateInterviewPrepPlanRequest,
   generateInterviewQuestionsRequest,
 } from "@/lib/ai/client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { shivaBuild, shivaTransform, vishnuContainer, vishnuItem, vishnuList, vishnuListItem } from "@/lib/motion";
 import type {
   InterviewLevel,
   InterviewLog,
@@ -53,227 +52,122 @@ type InterviewSelection = {
   interviewType: InterviewType;
 };
 
-const ROLE_OPTIONS: Array<{
-  value: InterviewRole;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "sde",
-    label: "SDE",
-    description: "Balanced software engineering preparation across coding, projects, and execution.",
-  },
-  {
-    value: "frontend",
-    label: "Frontend",
-    description: "UI architecture, state management, browser behavior, and product sense.",
-  },
-  {
-    value: "backend",
-    label: "Backend",
-    description: "APIs, data systems, scalability, and production engineering tradeoffs.",
-  },
-  {
-    value: "ml_engineer",
-    label: "ML Engineer",
-    description: "Models, evaluation, data pipelines, and applied ML decision-making.",
-  },
-  {
-    value: "core_engineering",
-    label: "Core Engineering",
-    description: "Systems, performance, low-level concepts, and engineering rigor.",
-  },
+const ROLE_OPTIONS: Array<{ value: InterviewRole; label: string }> = [
+  { value: "sde", label: "SDE" },
+  { value: "frontend", label: "Frontend" },
+  { value: "backend", label: "Backend" },
+  { value: "ml_engineer", label: "ML Engineer" },
+  { value: "core_engineering", label: "Core" },
 ];
 
-const LEVEL_OPTIONS: Array<{
-  value: InterviewLevel;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "beginner",
-    label: "Beginner",
-    description: "Foundational preparation with guided structure and clear ramp-up.",
-  },
-  {
-    value: "intermediate",
-    label: "Intermediate",
-    description: "Interview-ready practice with realistic problems and sharper expectations.",
-  },
-  {
-    value: "advanced",
-    label: "Advanced",
-    description: "Senior-level pressure testing, tradeoffs, communication, and depth.",
-  },
+const LEVEL_OPTIONS: Array<{ value: InterviewLevel; label: string }> = [
+  { value: "beginner", label: "Beginner" },
+  { value: "intermediate", label: "Intermediate" },
+  { value: "advanced", label: "Advanced" },
 ];
 
-const TYPE_OPTIONS: Array<{
-  value: InterviewType;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "dsa",
-    label: "DSA",
-    description: "Timed coding, patterns, complexity analysis, and problem-solving fluency.",
-  },
-  {
-    value: "system_design",
-    label: "System Design",
-    description: "Architecture, scale, tradeoffs, APIs, reliability, and evolution.",
-  },
-  {
-    value: "behavioral",
-    label: "HR / Behavioral",
-    description: "Stories, leadership, conflict, ownership, and communication under pressure.",
-  },
-  {
-    value: "project_based",
-    label: "Project-based",
-    description: "Deep dives on your work, decisions, impact, and lessons learned.",
-  },
-  {
-    value: "mixed",
-    label: "Mixed",
-    description: "A blended loop covering coding, system thinking, and communication.",
-  },
+const TYPE_OPTIONS: Array<{ value: InterviewType; label: string }> = [
+  { value: "dsa", label: "DSA" },
+  { value: "system_design", label: "System Design" },
+  { value: "behavioral", label: "Behavioral" },
+  { value: "project_based", label: "Project" },
+  { value: "mixed", label: "Mixed" },
 ];
-
-function InterviewSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-[220px] rounded-[1.75rem]" />
-      <Skeleton className="h-[320px] rounded-[1.5rem]" />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Skeleton className="h-[240px] rounded-[1.5rem]" />
-        <Skeleton className="h-[240px] rounded-[1.5rem]" />
-      </div>
-    </div>
-  );
-}
 
 function titleCase(value: string) {
-  return value
-    .split(/[_\s-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  return value.split(/[_\s-]+/).filter(Boolean).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" ");
 }
 
 function inferRoleFromProfile(skills: string[]): InterviewRole {
-  const normalized = skills.map((skill) => skill.toLowerCase());
-
-  if (normalized.some((skill) => ["react", "next.js", "nextjs", "css", "frontend"].includes(skill))) {
-    return "frontend";
-  }
-
-  if (normalized.some((skill) => ["node", "backend", "api", "postgres", "sql"].includes(skill))) {
-    return "backend";
-  }
-
-  if (normalized.some((skill) => ["ml", "machine learning", "pytorch", "tensorflow"].includes(skill))) {
-    return "ml_engineer";
-  }
-
-  if (normalized.some((skill) => ["c++", "operating systems", "core", "computer networks"].includes(skill))) {
-    return "core_engineering";
-  }
-
+  const n = skills.map((s) => s.toLowerCase());
+  if (n.some((s) => ["react", "next.js", "nextjs", "css", "frontend"].includes(s))) return "frontend";
+  if (n.some((s) => ["node", "backend", "api", "postgres", "sql"].includes(s))) return "backend";
+  if (n.some((s) => ["ml", "machine learning", "pytorch", "tensorflow"].includes(s))) return "ml_engineer";
+  if (n.some((s) => ["c++", "operating systems", "core", "computer networks"].includes(s))) return "core_engineering";
   return "sde";
 }
-
-function inferLevelFromExperience(experience: number | null | undefined): InterviewLevel {
-  if (!experience || experience <= 1) return "beginner";
-  if (experience >= 4) return "advanced";
-  return "intermediate";
+function inferLevelFromExperience(exp: number | null | undefined): InterviewLevel {
+  if (!exp || exp <= 1) return "beginner"; if (exp >= 4) return "advanced"; return "intermediate";
 }
-
 function inferInterviewType(role: InterviewRole): InterviewType {
   if (role === "frontend" || role === "backend") return "project_based";
-  if (role === "core_engineering") return "dsa";
-  return "mixed";
+  if (role === "core_engineering") return "dsa"; return "mixed";
 }
 
-function StepIndicator({ phase }: { phase: Phase }) {
-  const steps: Array<{ key: Phase | "result"; label: string; activeWhen: Phase[] }> = [
-    { key: "configure", label: "Setup", activeWhen: ["configure"] },
-    { key: "plan", label: "AI Plan", activeWhen: ["plan"] },
-    { key: "mock", label: "Mock Loop", activeWhen: ["mock", "result"] },
-  ];
+/* ─── Pill Selector ───────────────────────────────────────────────── */
 
-  return (
-    <div className="flex flex-wrap gap-3">
-      {steps.map((step, index) => {
-        const active = step.activeWhen.includes(phase);
-        const complete =
-          (phase === "plan" || phase === "mock" || phase === "result") && index === 0 ||
-          (phase === "mock" || phase === "result") && index === 1;
-
-        return (
-          <div
-            key={step.label}
-            className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs uppercase tracking-[0.22em] ${
-              active
-                ? "border-cyan-400/20 bg-cyan-400/10 text-cyan-100"
-                : complete
-                  ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                  : "border-white/10 bg-white/[0.04] text-slate-500"
-            }`}
-          >
-            <span>{index + 1}</span>
-            <span>{step.label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function SelectionGroup<T extends string>({
-  title,
-  description,
+const PillSelector = memo(function PillSelector<T extends string>({
+  label,
   options,
   value,
   onChange,
 }: {
-  title: string;
-  description: string;
-  options: Array<{ value: T; label: string; description: string }>;
+  label: string;
+  options: Array<{ value: T; label: string }>;
   value: T;
-  onChange: (value: T) => void;
+  onChange: (v: T) => void;
 }) {
   return (
-    <div className="space-y-3">
-      <div>
-        <p className="text-sm font-semibold text-white">{title}</p>
-        <p className="mt-1 text-sm text-slate-400">{description}</p>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {options.map((option) => {
-          const selected = value === option.value;
-
+    <div className="space-y-2">
+      <p className="kriya-label">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((opt) => {
+          const active = value === opt.value;
           return (
-            <motion.button
-              key={option.value}
+            <button
+              key={opt.value}
               type="button"
-              whileHover={{ y: -2, scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => onChange(option.value)}
-              className={`rounded-[1.25rem] border p-4 text-left transition ${
-                selected
-                  ? "border-cyan-400/30 bg-cyan-400/[0.1] text-white shadow-[0_20px_50px_rgba(34,211,238,0.08)]"
-                  : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:bg-white/[0.06]"
-              }`}
+              onClick={() => onChange(opt.value)}
+              className={cn(
+                "rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all duration-200",
+                active
+                  ? "bg-white/[0.08] text-white border border-white/[0.1]"
+                  : "text-slate-500 hover:text-slate-300 border border-transparent hover:border-white/[0.04]"
+              )}
             >
-              <p className="text-sm font-semibold">{option.label}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">{option.description}</p>
-            </motion.button>
+              {opt.label}
+            </button>
           );
         })}
       </div>
     </div>
   );
-}
+});
+
+/* ─── Step Bar ────────────────────────────────────────────────────── */
+
+const StepBar = memo(function StepBar({ phase }: { phase: Phase }) {
+  const steps = [
+    { key: "configure", label: "Setup" },
+    { key: "plan", label: "Plan" },
+    { key: "mock", label: "Mock" },
+  ] as const;
+  const phaseIndex = { configure: 0, plan: 1, mock: 2, result: 2 };
+  const current = phaseIndex[phase];
+
+  return (
+    <div className="flex items-center gap-2">
+      {steps.map((step, i) => (
+        <div key={step.key} className="flex items-center gap-2">
+          <span className={cn(
+            "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-medium transition-colors",
+            i < current ? "bg-white/[0.08] text-emerald-300" :
+            i === current ? "bg-white/[0.08] text-white" :
+            "bg-white/[0.02] text-slate-600"
+          )}>
+            {i < current ? <CheckCircle2 className="h-3 w-3" /> : i + 1}
+          </span>
+          <span className={cn("text-[11px] uppercase tracking-wider", i <= current ? "text-slate-300" : "text-slate-600")}>
+            {step.label}
+          </span>
+          {i < steps.length - 1 && <span className="text-slate-700 text-[10px]">→</span>}
+        </div>
+      ))}
+    </div>
+  );
+});
+
+/* ─── Main Page ───────────────────────────────────────────────────── */
 
 export default function InterviewPage() {
   const { user, profile } = useAuth();
@@ -297,713 +191,410 @@ export default function InterviewPage() {
 
   useEffect(() => {
     if (!profile) return;
-
-    setSelection((current) => ({
-      role: current.role || inferRoleFromProfile(profile.skills || []),
-      level: current.level || inferLevelFromExperience(profile.experience),
-      interviewType: current.interviewType || inferInterviewType(current.role),
+    setSelection((c) => ({
+      role: c.role || inferRoleFromProfile(profile.skills || []),
+      level: c.level || inferLevelFromExperience(profile.experience),
+      interviewType: c.interviewType || inferInterviewType(c.role),
     }));
   }, [profile]);
 
   useEffect(() => {
-    if (!user) {
-      setLoadingHistory(false);
-      return;
-    }
-
+    if (!user) { setLoadingHistory(false); return; }
     let cancelled = false;
-
     Promise.all([
-      supabase
-        .from("interview_logs")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(5),
-      supabase
-        .from("interview_preferences")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle(),
+      supabase.from("interview_logs").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+      supabase.from("interview_preferences").select("*").eq("user_id", user.id).maybeSingle(),
     ]).then(([historyResult, preferenceResult]) => {
       if (cancelled) return;
-
-      if (historyResult.error) {
-        logAppError("[INTERVIEW] Failed to load quiz history:", historyResult.error);
-        toast.error("We could not load your interview history.");
-      } else {
-        setHistory(historyResult.data ?? []);
+      if (historyResult.error) { logAppError("[INTERVIEW] history:", historyResult.error); }
+      else setHistory(historyResult.data ?? []);
+      if (!preferenceResult.error && preferenceResult.data) {
+        const p = preferenceResult.data as InterviewPreference;
+        setSelection({ role: p.role, level: p.level, interviewType: p.interview_type });
       }
-
-      if (preferenceResult.error) {
-        logAppError(
-          "[INTERVIEW] Failed to load interview preferences:",
-          preferenceResult.error
-        );
-      } else if (preferenceResult.data) {
-        const preference = preferenceResult.data as InterviewPreference;
-        setSelection({
-          role: preference.role,
-          level: preference.level,
-          interviewType: preference.interview_type,
-        });
-      }
-
       setLoadingHistory(false);
     });
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [supabase, user]);
 
   const averageScore = useMemo(() => {
     if (history.length === 0) return 0;
-    return Math.round(
-      history.reduce((total, log) => total + (log.quiz_score ?? 0), 0) / history.length
-    );
+    return Math.round(history.reduce((s, l) => s + (l.quiz_score ?? 0), 0) / history.length);
   }, [history]);
 
-  const profileSkills = profile?.skills ?? [];
+  const profileSkills = useMemo(() => profile?.skills ?? [], [profile?.skills]);
 
-  const savePreference = async () => {
+  const savePreference = useCallback(async () => {
     if (!user) return;
-
     setSavingPreference(true);
     try {
       const { error } = await supabase.from("interview_preferences").upsert(
-        {
-          user_id: user.id,
-          role: selection.role,
-          level: selection.level,
-          interview_type: selection.interviewType,
-          updated_at: new Date().toISOString(),
-        },
+        { user_id: user.id, role: selection.role, level: selection.level, interview_type: selection.interviewType, updated_at: new Date().toISOString() },
         { onConflict: "user_id" }
       );
+      if (error) throw error;
+    } catch (e) { logAppError("[INTERVIEW] Save pref failed:", e); throw e; }
+    finally { setSavingPreference(false); }
+  }, [selection, supabase, user]);
 
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      logAppError("[INTERVIEW] Failed to save preferences:", error);
-      throw error;
-    } finally {
-      setSavingPreference(false);
-    }
-  };
-
-  const generatePlan = async () => {
+  const generatePlan = useCallback(async () => {
     if (!user) return;
-
     setGeneratingPlan(true);
-
     try {
       await savePreference();
       const nextPlan = await generateInterviewPrepPlanRequest({
-        role: titleCase(selection.role),
-        level: titleCase(selection.level),
+        role: titleCase(selection.role), level: titleCase(selection.level),
         interviewType: titleCase(selection.interviewType),
-        industry: profile?.industry || "technology",
-        skills: profileSkills,
+        industry: profile?.industry || "technology", skills: profileSkills,
       });
+      setPlan(nextPlan); setPhase("plan");
+      toast.success("Prep plan generated.");
+    } catch (e) {
+      logAppError("[INTERVIEW AI] Plan failed:", e);
+      toast.error(e instanceof Error ? e.message : "Could not generate plan.");
+    } finally { setGeneratingPlan(false); }
+  }, [profileSkills, profile, savePreference, selection, user]);
 
-      setPlan(nextPlan);
-      setPhase("plan");
-      toast.success("Personalized interview plan generated.");
-    } catch (error) {
-      logAppError("[INTERVIEW AI] Failed to generate plan:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "We could not generate your interview plan."
-      );
-    } finally {
-      setGeneratingPlan(false);
-    }
-  };
-
-  const startMockInterview = async () => {
+  const startMockInterview = useCallback(async () => {
     setLaunchingMock(true);
-
     try {
       await savePreference();
       const data = await generateInterviewQuestionsRequest({
-        industry: profile?.industry || "technology",
-        skills: profileSkills,
-        role: titleCase(selection.role),
-        level: titleCase(selection.level),
+        industry: profile?.industry || "technology", skills: profileSkills,
+        role: titleCase(selection.role), level: titleCase(selection.level),
         interviewType: titleCase(selection.interviewType),
       });
-
-      setQuestions(data);
-      setCurrentIndex(0);
-      setAnswers({});
-      setResults(null);
-      setPhase("mock");
+      setQuestions(data); setCurrentIndex(0); setAnswers({}); setResults(null); setPhase("mock");
       toast.success("Mock interview ready.");
-    } catch (error) {
-      logAppError("[INTERVIEW AI] Failed to generate mock interview:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "We could not start your mock interview."
-      );
-    } finally {
-      setLaunchingMock(false);
-    }
-  };
+    } catch (e) {
+      logAppError("[INTERVIEW AI] Mock failed:", e);
+      toast.error(e instanceof Error ? e.message : "Could not start mock.");
+    } finally { setLaunchingMock(false); }
+  }, [profileSkills, profile, savePreference, selection]);
 
-  const selectAnswer = (answer: string) => {
-    setAnswers((current) => ({ ...current, [currentIndex]: answer }));
-  };
+  const selectAnswer = useCallback((answer: string) => {
+    setAnswers((c) => ({ ...c, [currentIndex]: answer }));
+  }, [currentIndex]);
 
-  const nextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((index) => index + 1);
-      return;
-    }
+  const submitQuizRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
-    void submitQuiz();
-  };
+  const nextQuestion = useCallback(() => {
+    if (currentIndex < questions.length - 1) { setCurrentIndex((i) => i + 1); return; }
+    void submitQuizRef.current?.();
+  }, [currentIndex, questions.length]);
 
-  const submitQuiz = async () => {
+  const submitQuiz = useCallback(async () => {
     if (!user) return;
-
-    const questionResults: QuestionResult[] = questions.map((question, index) => ({
-      question: question.question,
-      options: question.options,
-      correct_answer: question.correctAnswer,
-      user_answer: answers[index] || "",
-      is_correct: answers[index] === question.correctAnswer,
-      explanation: question.explanation,
-      difficulty: question.difficulty as "easy" | "medium" | "hard",
+    const questionResults: QuestionResult[] = questions.map((q, i) => ({
+      question: q.question, options: q.options, correct_answer: q.correctAnswer,
+      user_answer: answers[i] || "", is_correct: answers[i] === q.correctAnswer,
+      explanation: q.explanation, difficulty: q.difficulty as "easy" | "medium" | "hard",
     }));
-
-    const correctCount = questionResults.filter((entry) => entry.is_correct).length;
+    const correctCount = questionResults.filter((e) => e.is_correct).length;
     const score = Math.round((correctCount / questions.length) * 100);
-
     const log = {
-      user_id: user.id,
-      quiz_score: score,
-      questions: questionResults,
-      improvement_tip:
-        score < 70
-          ? `Focus on ${titleCase(selection.interviewType)} patterns and rehearse project stories with clearer structure.`
-          : `Strong performance. Keep sharpening ${titleCase(selection.interviewType)} communication and depth.`,
+      user_id: user.id, quiz_score: score, questions: questionResults,
+      improvement_tip: score < 70
+        ? `Focus on ${titleCase(selection.interviewType)} patterns and rehearse project stories with clearer structure.`
+        : `Strong performance. Keep sharpening ${titleCase(selection.interviewType)} communication and depth.`,
       created_at: new Date().toISOString(),
     };
-
     const { data, error } = await supabase.from("interview_logs").insert(log).select().single();
+    if (error) { logAppError("[INTERVIEW] Save failed:", error); toast.error("Results generated but could not save."); setPhase("result"); return; }
+    setResults(data); setHistory((c) => [data, ...c].slice(0, 5)); setPhase("result");
+  }, [user, questions, answers, selection.interviewType, supabase]);
 
-    if (error) {
-      logAppError("[INTERVIEW] Failed to persist quiz log:", error);
-      toast.error("Your results were generated, but we could not save the session.");
-      setPhase("result");
-      return;
-    }
-
-    setResults(data);
-    setHistory((current) => [data, ...current].slice(0, 5));
-    setPhase("result");
-  };
+  // Keep submitQuizRef in sync so nextQuestion always calls the latest version
+  useEffect(() => { submitQuizRef.current = submitQuiz; }, [submitQuiz]);
 
   const question = questions[currentIndex];
 
   if (loadingHistory) {
-    return <InterviewSkeleton />;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <span className="text-3xl" style={{ color: "hsl(var(--kriya-primary))", animation: "kriya-glyph-pulse 2.4s ease-in-out infinite" }}>◈</span>
+          <p className="kriya-label">Loading interview engine</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="glass-panel-strong relative overflow-hidden border-white/10">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.14),transparent_20%)]" />
-        <CardContent className="relative p-6 sm:p-8">
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.15fr)_320px]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-cyan-100">
-                <Sparkles className="h-3.5 w-3.5" />
-                Interview engine
-              </div>
-              <h1 className="mt-5 text-4xl font-semibold text-white sm:text-5xl">
-                Personalized interview prep with
-                <span className="text-gradient-premium"> AI guidance</span>.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                Configure your target role, current level, and interview focus. ELEV8
-                generates a structured prep plan, then launches a contextual mock loop.
-              </p>
-              <div className="mt-6">
-                <StepIndicator phase={phase} />
-              </div>
-            </div>
+    <div className="mx-auto max-w-4xl space-y-0">
 
-            <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-              {[
-                { label: "Sessions", value: history.length || 0, tone: "text-cyan-100" },
-                {
-                  label: "Average score",
-                  value: history.length ? `${averageScore}%` : "No data",
-                  tone: "text-violet-100",
-                },
-                {
-                  label: "Suggested track",
-                  value: titleCase(selection.role),
-                  tone: "text-slate-100",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-[1.35rem] border border-white/10 bg-white/[0.05] p-4"
-                >
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-                    {item.label}
-                  </p>
-                  <p className={`mt-3 text-2xl font-semibold ${item.tone}`}>{item.value}</p>
-                </div>
-              ))}
-            </div>
+      {/* ─── Header ─────────────────────────────────────────────── */}
+      <section className="py-8 sm:py-10">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div>
+            <p className="kriya-label mb-3">Interview Engine</p>
+            <h2 className="kriya-serif text-3xl sm:text-4xl font-light text-white leading-tight">
+              Personalized prep with <span className="text-gradient-premium">AI guidance</span>.
+            </h2>
           </div>
-        </CardContent>
-      </Card>
-
-      {phase === "configure" ? (
-        <Card className="border-white/10">
-          <CardHeader>
-            <CardTitle className="text-white">Configure your interview prep</CardTitle>
-            <CardDescription>
-              Your choices are saved to Supabase, reused for later sessions, and used to
-              generate a custom prep plan and mock interview flow.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="flex flex-wrap gap-2">
-              {profileSkills.slice(0, 6).map((skill) => (
-                <Badge
-                  key={skill}
-                  className="border-violet-400/20 bg-violet-400/10 text-violet-100"
-                >
-                  {skill}
-                </Badge>
-              ))}
-              {profileSkills.length === 0 ? (
-                <Badge className="border-white/10 bg-white/[0.05] text-slate-300">
-                  Add profile skills for stronger recommendations
-                </Badge>
-              ) : null}
-            </div>
-
-            <SelectionGroup
-              title="Role"
-              description="Choose the role track you want this prep system to optimize for."
-              options={ROLE_OPTIONS}
-              value={selection.role}
-              onChange={(role) =>
-                setSelection((current) => ({
-                  ...current,
-                  role,
-                  interviewType:
-                    current.interviewType || inferInterviewType(role),
-                }))
-              }
-            />
-
-            <SelectionGroup
-              title="Experience level"
-              description="This changes the difficulty, communication expectations, and study emphasis."
-              options={LEVEL_OPTIONS}
-              value={selection.level}
-              onChange={(level) => setSelection((current) => ({ ...current, level }))}
-            />
-
-            <SelectionGroup
-              title="Interview type"
-              description="Pick the area you want to prepare for right now."
-              options={TYPE_OPTIONS}
-              value={selection.interviewType}
-              onChange={(interviewType) =>
-                setSelection((current) => ({ ...current, interviewType }))
-              }
-            />
-
-            <div className="flex flex-wrap justify-end gap-3">
-              <Button
-                type="button"
-                onClick={generatePlan}
-                disabled={savingPreference || generatingPlan}
-              >
-                {savingPreference || generatingPlan ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <WandSparkles className="h-4 w-4" />
-                )}
-                {generatingPlan ? "Generating plan..." : "Generate AI prep plan"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {phase === "plan" && plan ? (
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-white">Your personalized prep plan</p>
-              <p className="mt-1 text-sm text-slate-400">{plan.summary}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button type="button" variant="outline" onClick={() => setPhase("configure")}>
-                <ChevronLeft className="h-4 w-4" />
-                Back to setup
-              </Button>
-              <Button
-                type="button"
-                onClick={startMockInterview}
-                disabled={launchingMock || savingPreference}
-              >
-                {launchingMock ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Brain className="h-4 w-4" />
-                )}
-                {launchingMock ? "Launching..." : "Start mock interview"}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2">
-            <Card className="border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white">Topics to study</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {plan.topics.map((topic) => (
-                  <div
-                    key={topic.title}
-                    className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-white">{topic.title}</p>
-                      <Badge
-                        className={
-                          topic.priority === "high"
-                            ? "border-rose-400/20 bg-rose-400/10 text-rose-100"
-                            : topic.priority === "medium"
-                              ? "border-cyan-400/20 bg-cyan-400/10 text-cyan-100"
-                              : "border-white/10 bg-white/[0.06] text-slate-300"
-                        }
-                      >
-                        {topic.priority}
-                      </Badge>
-                    </div>
-                    <p className="mt-2 text-sm leading-7 text-slate-400">{topic.reason}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white">Practice questions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {plan.practiceQuestions.map((question, index) => (
-                  <div
-                    key={`${question}-${index}`}
-                    className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <div className="flex gap-3">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400/12 text-xs font-semibold text-cyan-100">
-                        {index + 1}
-                      </div>
-                      <p className="text-sm leading-7 text-slate-300">{question}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2">
-            <Card className="border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white">Mock interview tasks</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {plan.mockTasks.map((task, index) => (
-                  <div
-                    key={`${task}-${index}`}
-                    className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <div className="flex gap-3">
-                      <Target className="mt-1 h-4 w-4 text-violet-200" />
-                      <p className="text-sm leading-7 text-slate-300">{task}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white">Timeline</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {plan.timeline.map((phaseItem) => (
-                  <div
-                    key={phaseItem.label}
-                    className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-                  >
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                      {phaseItem.label}
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-300">
-                      {phaseItem.focus}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+          <div className="flex items-center gap-x-6 gap-y-2 text-[12px] text-slate-500 shrink-0">
+            <span>Sessions: <span className="text-slate-300 font-medium">{history.length}</span></span>
+            <span>Avg: <span className="text-slate-300 font-medium">{history.length ? `${averageScore}%` : "—"}</span></span>
           </div>
         </div>
-      ) : null}
+        <div className="mt-5">
+          <StepBar phase={phase} />
+        </div>
+      </section>
 
-      {phase === "mock" && question ? (
-        <div className="space-y-4">
-          <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-2">
-                <Badge className="border-cyan-400/20 bg-cyan-400/10 text-cyan-100">
-                  {titleCase(selection.role)}
-                </Badge>
-                <Badge className="border-violet-400/20 bg-violet-400/10 text-violet-100">
-                  {titleCase(selection.level)}
-                </Badge>
-                <Badge className="border-white/10 bg-white/[0.06] text-slate-300">
-                  {titleCase(selection.interviewType)}
-                </Badge>
-              </div>
-              <span className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                {currentIndex + 1}/{questions.length}
-              </span>
-            </div>
-            <Progress
-              value={((currentIndex + 1) / questions.length) * 100}
-              className="h-2"
-            />
-          </div>
+      <div className="kriya-divider" />
 
-          <Card className="border-white/10">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
-                    Mock interview question
-                  </p>
-                  <h2 className="mt-3 text-2xl font-semibold text-white">
-                    {question.question}
-                  </h2>
+      {/* ─── CONFIGURE Phase ────────────────────────────────────── */}
+      <AnimatePresence mode="wait">
+        {phase === "configure" && (
+          <motion.div key="configure" variants={shivaTransform} initial="initial" animate="animate" exit="exit">
+            <section className="py-8 space-y-6">
+              {profileSkills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {profileSkills.slice(0, 6).map((s) => (
+                    <span key={s} className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-[10px] text-slate-400">{s}</span>
+                  ))}
                 </div>
-                <Badge className="border-violet-400/20 bg-violet-400/10 text-violet-100">
-                  {question.difficulty}
-                </Badge>
+              )}
+              <PillSelector label="Role" options={ROLE_OPTIONS} value={selection.role}
+                onChange={(role) => setSelection((c) => ({ ...c, role: role as InterviewRole, interviewType: c.interviewType || inferInterviewType(role as InterviewRole) }))} />
+              <PillSelector label="Level" options={LEVEL_OPTIONS} value={selection.level}
+                onChange={(level) => setSelection((c) => ({ ...c, level: level as InterviewLevel }))} />
+              <PillSelector label="Type" options={TYPE_OPTIONS} value={selection.interviewType}
+                onChange={(interviewType) => setSelection((c) => ({ ...c, interviewType: interviewType as InterviewType }))} />
+              <div className="flex justify-end pt-2">
+                <Button onClick={generatePlan} disabled={savingPreference || generatingPlan} className="rounded-xl">
+                  {generatingPlan ? <Loader2 className="h-4 w-4 animate-spin" /> : <WandSparkles className="h-4 w-4" />}
+                  {generatingPlan ? "Generating..." : "Generate prep plan"}
+                </Button>
+              </div>
+            </section>
+
+            {/* History */}
+            {history.length > 0 && (
+              <>
+                <div className="kriya-divider" />
+                <section className="py-8">
+                  <p className="kriya-label mb-4">Recent sessions</p>
+                  <div className="space-y-1">
+                    {history.map((entry) => (
+                      <div key={entry.id} className="flex items-center justify-between gap-4 rounded-lg px-3 py-2.5 hover:bg-white/[0.02] transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span className={cn(
+                            "text-sm font-medium",
+                            entry.quiz_score >= 70 ? "text-emerald-300" : entry.quiz_score >= 50 ? "text-amber-200" : "text-rose-200"
+                          )}>{entry.quiz_score}%</span>
+                          <span className="text-[11px] text-slate-500">{new Date(entry.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
+          </motion.div>
+        )}
+
+        {/* ─── PLAN Phase ───────────────────────────────────────── */}
+        {phase === "plan" && plan && (
+          <motion.div key="plan" variants={shivaTransform} initial="initial" animate="animate" exit="exit">
+            <section className="py-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <p className="kriya-label mb-2">Your prep plan</p>
+                  <p className="text-sm text-slate-400">{plan.summary}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <Button variant="ghost" size="sm" onClick={() => setPhase("configure")} className="text-slate-400">
+                    <ChevronLeft className="h-3.5 w-3.5" /> Setup
+                  </Button>
+                  <Button size="sm" onClick={startMockInterview} disabled={launchingMock} className="rounded-xl">
+                    {launchingMock ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Brain className="h-3.5 w-3.5" />}
+                    {launchingMock ? "Launching..." : "Start mock"}
+                  </Button>
+                </div>
               </div>
 
-              <div className="mt-6 space-y-3">
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Topics */}
+                <div className="space-y-3">
+                  <p className="kriya-label">Topics to study</p>
+                  {plan.topics.map((topic) => (
+                    <div key={topic.title} className="rounded-xl border border-white/[0.03] bg-white/[0.01] p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[13px] font-medium text-slate-300">{topic.title}</p>
+                        <span className={cn(
+                          "text-[10px] uppercase tracking-wider",
+                          topic.priority === "high" ? "text-rose-300" : topic.priority === "medium" ? "text-cyan-300" : "text-slate-500"
+                        )}>{topic.priority}</span>
+                      </div>
+                      <p className="mt-2 text-[12px] text-slate-500 leading-relaxed">{topic.reason}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Practice Questions */}
+                <div className="space-y-3">
+                  <p className="kriya-label">Practice questions</p>
+                  {plan.practiceQuestions.map((q, i) => (
+                    <div key={`${q}-${i}`} className="flex gap-3 rounded-xl border border-white/[0.03] bg-white/[0.01] p-4">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.04] text-[10px] text-slate-500 shrink-0 mt-0.5">{i + 1}</span>
+                      <p className="text-[12px] text-slate-400 leading-relaxed">{q}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Timeline */}
+            <div className="kriya-divider" />
+            <section className="py-8">
+              <p className="kriya-label mb-4">Timeline</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {plan.timeline.map((p) => (
+                  <div key={p.label} className="rounded-xl border border-white/[0.03] bg-white/[0.01] p-4">
+                    <p className="kriya-label">{p.label}</p>
+                    <p className="mt-2 text-[12px] text-slate-400 leading-relaxed">{p.focus}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </motion.div>
+        )}
+
+        {/* ─── MOCK Phase ───────────────────────────────────────── */}
+        {phase === "mock" && question && (
+          <motion.div key={`mock-${currentIndex}`} variants={shivaTransform} initial="initial" animate="animate" exit="exit">
+            <section className="py-10">
+              {/* Progress */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                  <span className="uppercase tracking-wider">{titleCase(selection.role)}</span>
+                  <span>·</span>
+                  <span className="uppercase tracking-wider">{titleCase(selection.level)}</span>
+                </div>
+                <span className="text-[11px] text-slate-500 font-mono">{currentIndex + 1}/{questions.length}</span>
+              </div>
+              <div className="h-1 w-full rounded-full bg-white/[0.04] overflow-hidden mb-8">
+                <div className="h-full rounded-full bg-white/20" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }} />
+              </div>
+
+              {/* Question */}
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <h3 className="kriya-serif text-xl sm:text-2xl font-light text-white leading-snug flex-1">
+                  {question.question}
+                </h3>
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 shrink-0 mt-1">{question.difficulty}</span>
+              </div>
+
+              {/* Options */}
+              <div className="space-y-2">
                 {question.options.map((option, index) => {
                   const selected = answers[currentIndex] === option;
-
                   return (
-                    <motion.button
+                    <button
                       key={option}
                       type="button"
-                      whileHover={{ y: -2, scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
                       onClick={() => selectAnswer(option)}
-                      className={`w-full rounded-[1.2rem] border p-4 text-left transition ${
+                      className={cn(
+                        "w-full flex items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200",
                         selected
-                          ? "border-cyan-400/30 bg-cyan-400/[0.1] text-white"
-                          : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:bg-white/[0.06]"
-                      }`}
+                          ? "border-white/[0.12] bg-white/[0.04] text-white"
+                          : "border-white/[0.04] bg-white/[0.01] text-slate-400 hover:border-white/[0.08] hover:bg-white/[0.02]"
+                      )}
                     >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                            selected
-                              ? "bg-cyan-400/20 text-cyan-100"
-                              : "bg-white/[0.06] text-slate-400"
-                          }`}
-                        >
-                          {String.fromCharCode(65 + index)}
-                        </div>
-                        <p className="text-sm leading-7">{option}</p>
-                      </div>
-                    </motion.button>
+                      <span className={cn(
+                        "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-medium shrink-0 mt-0.5",
+                        selected ? "bg-white/[0.08] text-white" : "bg-white/[0.03] text-slate-600"
+                      )}>
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <p className="text-[13px] leading-relaxed">{option}</p>
+                    </button>
                   );
                 })}
               </div>
 
-              <div className="mt-6 flex flex-wrap justify-between gap-3">
-                <Button type="button" variant="outline" onClick={() => setPhase("plan")}>
-                  <ChevronLeft className="h-4 w-4" />
-                  Back to plan
+              {/* Nav */}
+              <div className="mt-8 flex justify-between gap-3">
+                <Button variant="ghost" size="sm" onClick={() => setPhase("plan")} className="text-slate-400">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Plan
                 </Button>
-                <Button type="button" onClick={nextQuestion} disabled={!answers[currentIndex]}>
-                  {currentIndex === questions.length - 1 ? "Finish mock loop" : "Next question"}
-                  <ArrowRight className="h-4 w-4" />
+                <Button onClick={nextQuestion} disabled={!answers[currentIndex]} className="rounded-xl">
+                  {currentIndex === questions.length - 1 ? "Finish" : "Next"}
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : null}
+            </section>
+          </motion.div>
+        )}
 
-      {phase === "result" && results ? (
-        <div className="space-y-4">
-          <Card className="border-white/10">
-            <CardContent className="p-6 text-center">
-              <Trophy className="mx-auto h-12 w-12 text-amber-300" />
-              <p
-                className={`mt-4 text-5xl font-semibold ${
-                  results.quiz_score >= 70
-                    ? "text-emerald-300"
-                    : results.quiz_score >= 50
-                      ? "text-amber-200"
-                      : "text-rose-200"
-                }`}
-              >
+        {/* ─── RESULT Phase ─────────────────────────────────────── */}
+        {phase === "result" && results && (
+          <motion.div key="result" variants={shivaBuild} initial="initial" animate="animate">
+            <section className="py-14 text-center">
+              <Trophy className="mx-auto h-8 w-8 text-amber-300/80" />
+              <p className={cn(
+                "mt-4 kriya-serif text-5xl font-light",
+                results.quiz_score >= 70 ? "text-emerald-300" : results.quiz_score >= 50 ? "text-amber-200" : "text-rose-200"
+              )}>
                 {results.quiz_score}%
               </p>
-              <p className="mt-3 text-sm leading-7 text-slate-400">
-                {(results.questions as QuestionResult[]).filter((entry) => entry.is_correct).length} of{" "}
-                {results.questions.length} correct
+              <p className="mt-3 text-sm text-slate-400">
+                {(results.questions as QuestionResult[]).filter((e) => e.is_correct).length} of {results.questions.length} correct
               </p>
-              {results.improvement_tip ? (
-                <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-300">
-                  {results.improvement_tip}
-                </p>
-              ) : null}
+              {results.improvement_tip && (
+                <p className="mt-4 mx-auto max-w-lg text-[13px] text-slate-400 leading-relaxed">{results.improvement_tip}</p>
+              )}
               <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <Button type="button" variant="outline" onClick={() => setPhase("plan")}>
-                  <ChevronLeft className="h-4 w-4" />
-                  Back to plan
+                <Button variant="ghost" size="sm" onClick={() => setPhase("plan")} className="text-slate-400">
+                  <ChevronLeft className="h-3.5 w-3.5" /> Plan
                 </Button>
-                <Button type="button" onClick={startMockInterview} disabled={launchingMock}>
-                  {launchingMock ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-4 w-4" />
-                  )}
-                  {launchingMock ? "Launching..." : "Run another mock loop"}
+                <Button onClick={startMockInterview} disabled={launchingMock} className="rounded-xl">
+                  {launchingMock ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  {launchingMock ? "Launching..." : "Run again"}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </section>
 
-          {(results.questions as QuestionResult[]).map((entry, index) => (
-            <motion.div
-              key={`${entry.question}-${index}`}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.03 }}
-            >
-              <Card className="border-white/10">
-                <CardContent className="p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <p className="max-w-3xl text-sm font-medium leading-7 text-white">
-                      {entry.question}
-                    </p>
-                    <Badge
-                      className={
-                        entry.is_correct
-                          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                          : "border-rose-400/20 bg-rose-400/10 text-rose-100"
-                      }
-                    >
-                      {entry.is_correct ? (
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                      ) : (
-                        <XCircle className="mr-1 h-3 w-3" />
-                      )}
-                      {entry.is_correct ? "Correct" : "Needs work"}
-                    </Badge>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.04] p-4">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                        Your answer
-                      </p>
-                      <p
-                        className={`mt-2 text-sm leading-7 ${
-                          entry.is_correct ? "text-emerald-100" : "text-rose-100"
-                        }`}
-                      >
-                        {entry.user_answer || "No answer submitted"}
-                      </p>
-                    </div>
-
-                    {!entry.is_correct ? (
-                      <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.04] p-4">
-                        <p className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                          Stronger answer
-                        </p>
-                        <p className="mt-2 text-sm leading-7 text-emerald-100">
-                          {entry.correct_answer}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-4 rounded-[1.15rem] border border-white/10 bg-white/[0.04] p-4">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-500">
-                      AI feedback
-                    </p>
-                    <p className="mt-2 text-sm leading-7 text-slate-300">{entry.explanation}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      ) : null}
-
-      {phase === "configure" && history.length > 0 ? (
-        <Card className="border-white/10">
-          <CardHeader>
-            <CardTitle className="text-white">Recent mock loops</CardTitle>
-            <CardDescription>
-              Your most recent interview sessions so you can track momentum over time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {history.map((entry) => (
-              <div
-                key={entry.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4"
-              >
-                <div>
-                  <p className="text-sm font-medium text-white">{entry.quiz_score}% score</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.22em] text-slate-500">
-                    {new Date(entry.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <Badge
-                  className={
-                    entry.quiz_score >= 70
-                      ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                      : entry.quiz_score >= 50
-                        ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
-                        : "border-rose-400/20 bg-rose-400/10 text-rose-100"
-                  }
+            {/* Question breakdown */}
+            <div className="kriya-divider" />
+            <motion.section variants={vishnuContainer} initial="hidden" animate="visible" className="py-8 space-y-3">
+              <p className="kriya-label mb-4">Question breakdown</p>
+              {(results.questions as QuestionResult[]).map((entry, index) => (
+                <motion.div key={`${entry.question}-${index}`} variants={vishnuItem}
+                  className="rounded-xl border border-white/[0.03] bg-white/[0.01] p-5"
                 >
-                  score signal
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      ) : null}
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <p className="text-[13px] font-medium text-slate-300 leading-relaxed flex-1">{entry.question}</p>
+                    <span className={cn(
+                      "inline-flex items-center gap-1 text-[10px] uppercase tracking-wider shrink-0",
+                      entry.is_correct ? "text-emerald-300" : "text-rose-300"
+                    )}>
+                      {entry.is_correct ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                      {entry.is_correct ? "Correct" : "Wrong"}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-[12px]">
+                    <div className="flex gap-2">
+                      <span className="text-slate-600 shrink-0 w-16">Your pick:</span>
+                      <span className={entry.is_correct ? "text-emerald-300" : "text-rose-300"}>{entry.user_answer || "—"}</span>
+                    </div>
+                    {!entry.is_correct && (
+                      <div className="flex gap-2">
+                        <span className="text-slate-600 shrink-0 w-16">Answer:</span>
+                        <span className="text-emerald-300">{entry.correct_answer}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="mt-3 text-[12px] text-slate-500 leading-relaxed">{entry.explanation}</p>
+                </motion.div>
+              ))}
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

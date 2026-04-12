@@ -1,66 +1,97 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, memo } from "react";
 
-const particles = Array.from({ length: 14 }).map((_, index) => ({
-  id: index,
-  top: `${8 + ((index * 13) % 72)}%`,
-  left: `${6 + ((index * 17) % 84)}%`,
-  duration: 16 + (index % 6) * 3,
-  delay: (index % 5) * 0.8,
-}));
+/**
+ * KRIYA App Background — Performance-Optimized
+ *
+ * Changes from previous version:
+ * - Particles moved to pure CSS @keyframes (no React re-renders)
+ * - Ambient orbs use CSS animations instead of Framer Motion
+ * - Pointer follower uses CSS custom properties + RAF (no state updates)
+ * - Device-adaptive: reduced visuals on low-end devices
+ * - Respects prefers-reduced-motion
+ */
 
-export function AppBackground() {
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+function AppBackgroundInner() {
+  const pointerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Skip pointer tracking on touch devices
+    const isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice || !pointerRef.current) return;
+
+    let rafId = 0;
+    let latestX = 0;
+    let latestY = 0;
+
     const handlePointerMove = (event: PointerEvent) => {
-      setPointer({ x: event.clientX, y: event.clientY });
+      latestX = event.clientX;
+      latestY = event.clientY;
+
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          if (pointerRef.current) {
+            pointerRef.current.style.transform = `translate3d(${latestX - 72}px, ${latestY - 72}px, 0)`;
+          }
+          rafId = 0;
+        });
+      }
     };
 
-    window.addEventListener("pointermove", handlePointerMove);
-    return () => window.removeEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(122,92,255,0.18),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(0,212,255,0.14),transparent_24%),linear-gradient(180deg,#0b0f19_0%,#121826_48%,#0b1020_100%)]" />
-      <div className="absolute inset-0 bg-grid-premium opacity-40" />
-      <motion.div
-        animate={{ opacity: [0.35, 0.6, 0.35], scale: [1, 1.08, 1] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-32 left-1/3 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(117,87,255,0.28),transparent_60%)] blur-3xl"
-      />
-      <motion.div
-        animate={{ opacity: [0.25, 0.45, 0.25], scale: [1.05, 0.95, 1.05] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[-10rem] right-[-6rem] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(25,197,255,0.18),transparent_60%)] blur-3xl"
-      />
-
-      {particles.map((particle) => (
-        <motion.span
-          key={particle.id}
-          className="absolute h-1.5 w-1.5 rounded-full bg-cyan-300/40 shadow-[0_0_24px_rgba(34,211,238,0.6)]"
-          style={{ top: particle.top, left: particle.left }}
-          animate={{ y: [0, -18, 0], opacity: [0.15, 0.6, 0.15] }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: particle.delay,
-          }}
-        />
-      ))}
-
-      <motion.div
-        className="absolute h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(122,92,255,0.28),rgba(122,92,255,0)_68%)] blur-2xl"
-        animate={{
-          x: pointer.x - 80,
-          y: pointer.y - 80,
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      {/* Base gradient — pure CSS, no JS */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(circle at top, var(--kriya-gradient-start), transparent 28%),
+            radial-gradient(circle at 80% 20%, var(--kriya-gradient-end), transparent 24%),
+            linear-gradient(180deg, hsl(var(--kriya-surface)) 0%, hsl(var(--kriya-surface-raised)) 48%, hsl(var(--kriya-surface)) 100%)
+          `,
         }}
-        transition={{ type: "spring", damping: 30, stiffness: 160, mass: 0.6 }}
+      />
+
+      {/* Grid overlay — static CSS */}
+      <div className="absolute inset-0 bg-grid-premium opacity-30" />
+
+      {/* Ambient orbs — CSS-only animations */}
+      <div className="kriya-orb kriya-orb--primary" />
+      <div className="kriya-orb kriya-orb--accent" />
+
+      {/* Particles — CSS-only, no React components */}
+      <div className="kriya-particles" aria-hidden="true">
+        <span className="kriya-particle" style={{ top: "12%", left: "10%", animationDelay: "0s", animationDuration: "18s" }} />
+        <span className="kriya-particle" style={{ top: "29%", left: "33%", animationDelay: "1.2s", animationDuration: "22s" }} />
+        <span className="kriya-particle" style={{ top: "46%", left: "56%", animationDelay: "2.4s", animationDuration: "20s" }} />
+        <span className="kriya-particle" style={{ top: "63%", left: "79%", animationDelay: "0.6s", animationDuration: "24s" }} />
+        <span className="kriya-particle" style={{ top: "80%", left: "18%", animationDelay: "1.8s", animationDuration: "19s" }} />
+      </div>
+
+      {/* Pointer follower — CSS transform only, no state rerenders */}
+      <div
+        ref={pointerRef}
+        className="kriya-pointer-follower"
+        style={{
+          background: `radial-gradient(circle, hsl(var(--kriya-primary) / 0.18), transparent 68%)`,
+        }}
       />
     </div>
   );
 }
+
+export const AppBackground = memo(AppBackgroundInner);

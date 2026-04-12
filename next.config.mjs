@@ -6,21 +6,33 @@ const nextConfig = {
         protocol: "https",
         hostname: "randomuser.me",
       },
-      {
-        protocol: "https",
-        hostname: "img.clerk.com",
-      },
     ],
   },
 
-  // Allow builds to complete even with lint warnings
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Career-Ops requires Playwright for PDF generation (server-side only)
+  serverExternalPackages: ["playwright"],
 
-  // Allow gradual TypeScript adoption
-  typescript: {
-    ignoreBuildErrors: true,
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+        ],
+      },
+    ];
   },
 };
 
