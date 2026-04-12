@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { ReactLenis } from "@studio-freight/react-lenis";
+import { ReactLenis } from "lenis/react";
 
 export function SmoothScroller({ children }: { children: ReactNode }) {
   return (
